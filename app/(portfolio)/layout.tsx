@@ -4,11 +4,11 @@
  * Key collaborators: ThemeProvider, ClerkProvider, Sanity Live/Visual Editing, sidebar UI.
  * Notes/assumptions: Draft mode controls visual editing features on the page.
  */
+
 import { ClerkProvider } from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { SanityLive } from "@/sanity/lib/live";
-import "../globals.css";
 import { draftMode } from "next/headers";
 import Script from "next/script";
 import { VisualEditing } from "next-sanity/visual-editing";
@@ -19,6 +19,8 @@ import { FloatingDock } from "@/components/FloatingDock";
 import SidebarToggle from "@/components/SidebarToggle";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SanityLive } from "@/sanity/lib/live";
+import "../globals.css";
 
 /**
  * Purpose: Register the primary sans font for the app.
@@ -101,6 +103,8 @@ export default async function RootLayout({
               </>
             )}
           </ThemeProvider>
+
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
