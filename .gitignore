@@ -39,3 +39,23 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local execution logs
+logs/
+
+# security reports and inventories
+security/
+
+# sanity local configuration and cache
+.sanity/
+
+# build artifacts
+dist/
+
+# local project instructions
+instructions.md
+
+# generated sanity files
+sanity.types.ts
+schema.json
+sanity-typegen.json
