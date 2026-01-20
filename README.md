@@ -3,7 +3,7 @@
 > **The modern portfolio for the engineering leader.**
 > Built with Next.js 16 (Turbopack), Sanity CMS, and Tailwind v4. Designed for performance, scalability, and admin-grade content management.
 
-[Live Demo (Vercel)](https://nextgen-portfolio.vercel.app) | [Documentation](docs/) | [Setup Guide](#developer-guide-clone--run) | [Screenshots](#features--screenshots-portfolio-showcase)
+[Live Demo (Vercel)](https://shivansh-sharma.vercel.app) | [Setup Guide](#developer-guide-clone--run) | [Screenshots](#features--screenshots-portfolio-showcase)
 
 ---
 
@@ -212,12 +212,11 @@ nextgen-portfolio/
 *   [ ] **i18n Support**: Full internationalization for German/English switching.
 *   [ ] **Dark Mode Toggle**: Persistent user preference for theme.
 *   [ ] **E2E Testing**: comprehensive Playwright suite for critical user flows.
-*   [ ] **Blog Comments**: Integration with Giscus or similar.
 
 ---
 
 ### Maintainer
-**Shiv Sharma**
-Senior Frontend Engineer & Full Stack Developer
-[LinkedIn](#) | [GitHub](#)
+**Shivansh Sharma**
+AI Engineer & Full Stack Developer
+[LinkedIn](https://linkedin.com/in/shivsharma-ss/)
 
