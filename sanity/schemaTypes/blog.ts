@@ -1,3 +1,8 @@
+/**
+ * Purpose: Define the Sanity schema for blog posts.
+ * Main responsibilities: Capture article metadata and publishing details.
+ * Key collaborators: Rendered in the blog section and Studio listings.
+ */
 import { defineField, defineType } from "sanity";
 
 export default defineType({
@@ -90,6 +95,11 @@ export default defineType({
       media: "featuredImage",
       category: "category",
     },
+    /**
+     * Purpose: Format the preview listing for blog documents.
+     * Main responsibilities: Show category subtitle and featured image.
+     * Inputs/outputs: Receives selection and returns preview metadata.
+     */
     prepare(selection) {
       const { title, media, category } = selection;
       return {

@@ -1,3 +1,8 @@
+/**
+ * Purpose: Register all Sanity schema types for the Studio.
+ * Main responsibilities: Aggregate schema definitions into a single export.
+ * Key collaborators: Imported by `sanity.config.ts`.
+ */
 import type { SchemaTypeDefinition } from "sanity";
 import achievement from "./achievement";
 import blog from "./blog";

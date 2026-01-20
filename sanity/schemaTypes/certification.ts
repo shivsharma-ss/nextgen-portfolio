@@ -1,3 +1,8 @@
+/**
+ * Purpose: Define the Sanity schema for certifications.
+ * Main responsibilities: Capture credential details and related skills.
+ * Key collaborators: Rendered in the certifications section and Studio listings.
+ */
 import { defineField, defineType } from "sanity";
 
 export default defineType({

@@ -1,3 +1,8 @@
+/**
+ * Purpose: Define the Sanity schema for skill entries.
+ * Main responsibilities: Capture skill metadata used in charts and lists.
+ * Key collaborators: Referenced by projects and skills sections.
+ */
 import { defineField, defineType } from "sanity";
 
 export default defineType({
@@ -74,6 +79,11 @@ export default defineType({
       subtitle: "category",
       proficiency: "proficiency",
     },
+    /**
+     * Purpose: Format the preview listing for skill documents.
+     * Main responsibilities: Build a subtitle from category and proficiency.
+     * Inputs/outputs: Receives selection and returns preview metadata.
+     */
     prepare(selection) {
       const { title, subtitle, proficiency } = selection;
       return {

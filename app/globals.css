@@ -1,3 +1,9 @@
+/*
+ * Purpose: Define global styles, theme tokens, and shared animations.
+ * Main responsibilities: Configure CSS variables and Tailwind base layers.
+ * Key collaborators: Consumed by Next.js layout and Tailwind utilities.
+ * Notes/assumptions: Uses OKLCH color tokens for light/dark themes.
+ */
 @import "tailwindcss";
 @import "tw-animate-css";
 

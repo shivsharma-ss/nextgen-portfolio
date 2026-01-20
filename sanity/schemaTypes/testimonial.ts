@@ -1,3 +1,8 @@
+/**
+ * Purpose: Define the Sanity schema for client testimonials.
+ * Main responsibilities: Capture testimonial text and attribution details.
+ * Key collaborators: Rendered in testimonials section and Studio listings.
+ */
 import { defineField, defineType } from "sanity";
 
 export default defineType({
@@ -93,6 +98,11 @@ export default defineType({
       media: "avatar",
       featured: "featured",
     },
+    /**
+     * Purpose: Format the preview listing for testimonial documents.
+     * Main responsibilities: Mark featured testimonials in the title.
+     * Inputs/outputs: Receives selection and returns preview metadata.
+     */
     prepare(selection) {
       const { title, subtitle, media, featured } = selection;
       return {

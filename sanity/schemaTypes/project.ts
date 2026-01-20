@@ -1,3 +1,8 @@
+/**
+ * Purpose: Define the Sanity schema for portfolio projects.
+ * Main responsibilities: Describe project fields, metadata, and ordering.
+ * Key collaborators: Used by project sections and Studio listings.
+ */
 import { defineField, defineType } from "sanity";
 
 export default defineType({
@@ -109,6 +114,11 @@ export default defineType({
       category: "category",
       featured: "featured",
     },
+    /**
+     * Purpose: Format the preview listing for project documents.
+     * Main responsibilities: Add featured indicator and category subtitle.
+     * Inputs/outputs: Receives selection and returns preview metadata.
+     */
     prepare(selection) {
       const { title, media, category, featured } = selection;
       return {

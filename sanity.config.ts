@@ -1,9 +1,11 @@
-'use client'
+"use client";
 
 /**
- * This configuration is used to for the Sanity Studio that's mounted on the `/app/studio/[[...tool]]/page.tsx` route
+ * Purpose: Configure the Sanity Studio embedded in the Next.js app.
+ * Main responsibilities: Define studio title, schema, and editor plugins.
+ * Key collaborators: Imports schema and structure from `sanity/schemaTypes` and `sanity/structure`.
+ * Notes/assumptions: The Studio is mounted at `/studio` and uses preview mode routes.
  */
-
 import { RocketIcon } from "@sanity/icons";
 import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";

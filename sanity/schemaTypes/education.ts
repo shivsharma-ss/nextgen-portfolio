@@ -1,3 +1,8 @@
+/**
+ * Purpose: Define the Sanity schema for education history.
+ * Main responsibilities: Capture academic background for the portfolio.
+ * Key collaborators: Rendered in the education section and Studio listings.
+ */
 import { defineField, defineType } from "sanity";
 
 export default defineType({

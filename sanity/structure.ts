@@ -1,3 +1,9 @@
+/**
+ * Purpose: Define the custom navigation structure for Sanity Studio.
+ * Main responsibilities: Group content types and singleton entries for editors.
+ * Key collaborators: Uses Sanity Structure Builder and schema types.
+ * Notes/assumptions: Singleton documents use fixed document IDs.
+ */
 import {
   AsteriskIcon,
   BookIcon,
@@ -16,7 +22,11 @@ import {
 } from "@sanity/icons";
 import type { StructureResolver } from "sanity/structure";
 
-// https://www.sanity.io/docs/structure-builder-cheat-sheet
+/**
+ * Purpose: Build the Studio structure tree for portfolio content.
+ * Main responsibilities: Define list groupings and singleton navigation.
+ * Inputs/outputs: Receives the Structure Builder and returns a list node.
+ */
 export const structure: StructureResolver = (S) =>
   S.list()
     .title("Portfolio Content")

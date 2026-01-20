@@ -1,3 +1,8 @@
+/**
+ * Purpose: Define the Sanity schema for achievements and awards.
+ * Main responsibilities: Capture recognition details for the portfolio.
+ * Key collaborators: Displayed in the achievements section and Studio listings.
+ */
 import { defineField, defineType } from "sanity";
 
 export default defineType({
@@ -81,6 +86,11 @@ export default defineType({
       media: "image",
       type: "type",
     },
+    /**
+     * Purpose: Format the preview listing for achievement documents.
+     * Main responsibilities: Show type and issuer alongside the title.
+     * Inputs/outputs: Receives selection and returns preview metadata.
+     */
     prepare(selection) {
       const { title, subtitle, media, type } = selection;
       return {

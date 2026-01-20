@@ -1,3 +1,8 @@
+/**
+ * Purpose: Define the Sanity schema for the profile singleton.
+ * Main responsibilities: Describe fields used across the portfolio hero/about.
+ * Key collaborators: Referenced by Studio structure and frontend queries.
+ */
 import { defineField, defineType } from "sanity";
 
 export default defineType({
@@ -169,6 +174,11 @@ export default defineType({
       subtitle: "headline",
       media: "profileImage",
     },
+    /**
+     * Purpose: Format the preview listing for profile documents.
+     * Main responsibilities: Map selected fields to title/subtitle/media.
+     * Inputs/outputs: Receives selection and returns preview metadata.
+     */
     prepare(selection) {
       const { title, subtitle, media } = selection;
       return {

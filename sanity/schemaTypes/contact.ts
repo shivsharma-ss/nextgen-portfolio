@@ -1,3 +1,8 @@
+/**
+ * Purpose: Define the Sanity schema for contact form submissions.
+ * Main responsibilities: Store inbound inquiries and status tracking.
+ * Key collaborators: Populated by server actions and reviewed in Studio.
+ */
 import { defineField, defineType } from "sanity";
 
 export default defineType({
@@ -61,6 +66,11 @@ export default defineType({
       subtitle: "email",
       status: "status",
     },
+    /**
+     * Purpose: Format the preview listing for contact submissions.
+     * Main responsibilities: Prefix title with status and show sender email.
+     * Inputs/outputs: Receives selection and returns preview metadata.
+     */
     prepare(selection) {
       const { title, subtitle, status } = selection;
       const statusEmoji = {

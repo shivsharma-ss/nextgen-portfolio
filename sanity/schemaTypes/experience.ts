@@ -1,3 +1,8 @@
+/**
+ * Purpose: Define the Sanity schema for work experience.
+ * Main responsibilities: Capture roles, timelines, and achievements.
+ * Key collaborators: Rendered in the experience section and Studio listings.
+ */
 import { defineField, defineType } from "sanity";
 
 export default defineType({
@@ -117,6 +122,11 @@ export default defineType({
       media: "companyLogo",
       current: "current",
     },
+    /**
+     * Purpose: Format the preview listing for experience documents.
+     * Main responsibilities: Mark current roles and show company.
+     * Inputs/outputs: Receives selection and returns preview metadata.
+     */
     prepare(selection) {
       const { title, subtitle, media, current } = selection;
       return {

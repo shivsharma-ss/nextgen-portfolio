@@ -1,3 +1,8 @@
+/**
+ * Purpose: Define the Sanity schema for services offered.
+ * Main responsibilities: Capture service details, pricing, and features.
+ * Key collaborators: Rendered in the services section and Studio listings.
+ */
 import { defineField, defineType } from "sanity";
 
 export default defineType({
@@ -121,6 +126,11 @@ export default defineType({
       media: "icon",
       featured: "featured",
     },
+    /**
+     * Purpose: Format the preview listing for service documents.
+     * Main responsibilities: Mark featured services in the title.
+     * Inputs/outputs: Receives selection and returns preview metadata.
+     */
     prepare(selection) {
       const { title, media, featured } = selection;
       return {

@@ -43,6 +43,9 @@ next-env.d.ts
 # local execution logs
 logs/
 
+# local utility scripts
+scripts/
+
 # security reports and inventories
 security/
 
@@ -54,6 +57,8 @@ dist/
 
 # local project instructions
 instructions.md
+commenting_instructions.md
+readme_instructions.md
 
 # generated sanity files
 sanity.types.ts

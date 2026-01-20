@@ -1,3 +1,8 @@
+/**
+ * Purpose: Define the Sanity schema for global site settings.
+ * Main responsibilities: Store SEO metadata, hero content, and toggles.
+ * Key collaborators: Consumed by layout and section queries.
+ */
 import { defineField, defineType } from "sanity";
 
 export default defineType({

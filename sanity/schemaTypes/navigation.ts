@@ -1,3 +1,8 @@
+/**
+ * Purpose: Define the Sanity schema for navigation links.
+ * Main responsibilities: Capture link labels, URLs, and ordering.
+ * Key collaborators: Rendered in site navigation and Studio listings.
+ */
 import { defineField, defineType } from "sanity";
 
 export default defineType({
@@ -48,6 +53,11 @@ export default defineType({
       subtitle: "href",
       order: "order",
     },
+    /**
+     * Purpose: Format the preview listing for navigation links.
+     * Main responsibilities: Prefix titles with ordering index.
+     * Inputs/outputs: Receives selection and returns preview metadata.
+     */
     prepare(selection) {
       const { title, subtitle, order } = selection;
       return {

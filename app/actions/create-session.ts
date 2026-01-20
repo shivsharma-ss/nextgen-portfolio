@@ -1,8 +1,21 @@
 "use server";
 
+/**
+ * Purpose: Create server actions for initiating ChatKit sessions.
+ * Main responsibilities: Authenticate users and request OpenAI session secrets.
+ * Key collaborators: Clerk auth, OpenAI ChatKit API, and workflow config.
+ * Notes/assumptions: Requires OPENAI_API_KEY and WORKFLOW_ID to be set.
+ */
 import { auth } from "@clerk/nextjs/server";
 import { WORKFLOW_ID } from "@/lib/config";
 
+/**
+ * Purpose: Create a ChatKit session for the current authenticated user.
+ * Main responsibilities: Validate auth and configuration, then request a session.
+ * Inputs/outputs: Returns a client secret string for the ChatKit SDK.
+ * Side effects: Performs a network request to the OpenAI ChatKit API.
+ * Errors: Throws when user is unauthenticated or the API request fails.
+ */
 export async function createSession() {
   const { userId } = await auth();
 
