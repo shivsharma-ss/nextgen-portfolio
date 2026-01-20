@@ -35,6 +35,7 @@ yarn-error.log*
 
 # vercel
 .vercel
+.vercel.env.json
 
 # typescript
 *.tsbuildinfo
@@ -44,13 +45,14 @@ next-env.d.ts
 logs/
 
 # local utility scripts
-scripts/
+# scripts/
+scripts/capture_screenshots.ts
 
 # security reports and inventories
 security/
 
 # sanity local configuration and cache
-.sanity/
+.sanity/*
 
 # build artifacts
 dist/

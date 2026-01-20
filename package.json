@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",
-    "typegen": "sanity schema extract && sanity typegen generate"
+    "typegen": "sanity schema extract && sanity typegen generate",
+    "vercel:env-sync": "node scripts/vercel-env-sync.mjs",
+    "vercel:env-dry": "node scripts/vercel-env-sync.mjs --dry-run"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.36.8",
