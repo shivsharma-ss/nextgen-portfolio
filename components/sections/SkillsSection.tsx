@@ -2,20 +2,25 @@ import { defineQuery } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
 import { SkillsChart } from "./SkillsChart";
 
-const SKILLS_QUERY =
-  defineQuery(`*[_type == "skill"] | order(category asc, order asc){
+const SKILLS_CATEGORIES_QUERY =
+  defineQuery(`*[_type == "skillCategory"] | order(order asc){
   name,
-  category,
-  proficiency,
-  percentage,
-  yearsOfExperience,
-  color
+  skills[]->{
+    name,
+    category,
+    proficiency,
+    percentage,
+    yearsOfExperience,
+    color
+  }
 }`);
 
 export async function SkillsSection() {
-  const { data: skills } = await sanityFetch({ query: SKILLS_QUERY });
+  const { data: categories } = await sanityFetch({
+    query: SKILLS_CATEGORIES_QUERY,
+  });
 
-  if (!skills || skills.length === 0) {
+  if (!categories || categories.length === 0) {
     return null;
   }
 
@@ -32,7 +37,7 @@ export async function SkillsSection() {
           </p>
         </div>
 
-        <SkillsChart skills={skills} />
+        <SkillsChart categories={categories} />
       </div>
     </section>
   );
