@@ -26,9 +26,10 @@ jobs:
       - name: Deploy to Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
         run: |
           echo "🚀 Deploying to Vercel (non-interactive)..."
-          npx vercel --token "$VERCEL_TOKEN" --prod --confirm
+          npx vercel --token "$VERCEL_TOKEN" --prod --yes --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET"
 
       - name: Promote production domain
         env:
