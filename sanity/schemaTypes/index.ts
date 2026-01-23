@@ -16,7 +16,6 @@ import project from "./project";
 import service from "./service";
 import siteSettings from "./siteSettings";
 import skill from "./skill";
-import skillCategory from "./skillCategory";
 import testimonial from "./testimonial";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
@@ -24,7 +23,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     profile,
     project,
     skill,
-    skillCategory,
     experience,
     education,
     testimonial,

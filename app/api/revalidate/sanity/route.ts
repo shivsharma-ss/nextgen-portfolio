@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     return new Response("Missing document type", { status: 400 });
   }
 
-  revalidateTag("sanity");
+  revalidateTag("sanity", "seconds");
 
   return Response.json({ revalidated: ["sanity"] });
 }
