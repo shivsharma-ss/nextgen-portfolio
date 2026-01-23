@@ -17,27 +17,22 @@ interface Skill {
   color: string | null;
 }
 
-interface SkillCategory {
-  name: string | null;
+interface SkillsChartProps {
   skills: Skill[];
 }
 
-interface SkillsChartProps {
-  categories: SkillCategory[];
-}
-
-export function SkillsChart({ categories }: SkillsChartProps) {
-  if (!categories || categories.length === 0) {
+export function SkillsChart({ skills }: SkillsChartProps) {
+  if (!skills || skills.length === 0) {
     return null;
   }
 
-  // Convert categories array to Map for easier handling
+  // Group skills by category dynamically
   const groupedSkills = new Map<string, Skill[]>();
 
-  for (const category of categories) {
-    const categoryName = category.name || "other";
-    const categorySkills = category.skills || [];
-    groupedSkills.set(categoryName, categorySkills);
+  for (const skill of skills) {
+    const category = skill.category || "other";
+    const existing = groupedSkills.get(category) || [];
+    groupedSkills.set(category, [...existing, skill]);
   }
 
   return (

@@ -13,19 +13,18 @@ export const apiVersion =
  * Errors: Throws when NEXT_PUBLIC_SANITY_DATASET is missing.
  */
 export const dataset = assertValue(
-  process.env.SANITY_STUDIO_DATASET ?? process.env.NEXT_PUBLIC_SANITY_DATASET,
-  "Missing environment variable: SANITY_STUDIO_DATASET or NEXT_PUBLIC_SANITY_DATASET",
+  process.env.NEXT_PUBLIC_SANITY_DATASET,
+  "Missing environment variable: NEXT_PUBLIC_SANITY_DATASET",
 );
 
 /**
  * Purpose: Resolve the Sanity project ID.
  * Main responsibilities: Validate presence of project configuration.
- * Errors: Throws when SANITY_STUDIO_PROJECT_ID or NEXT_PUBLIC_SANITY_PROJECT_ID is missing.
+ * Errors: Throws when NEXT_PUBLIC_SANITY_PROJECT_ID is missing.
  */
 export const projectId = assertValue(
-  process.env.SANITY_STUDIO_PROJECT_ID ??
-    process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-  "Missing environment variable: SANITY_STUDIO_PROJECT_ID or NEXT_PUBLIC_SANITY_PROJECT_ID",
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  "Missing environment variable: NEXT_PUBLIC_SANITY_PROJECT_ID",
 );
 
 /**
