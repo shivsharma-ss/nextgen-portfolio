@@ -25,7 +25,7 @@ jobs:
 
       - name: Validate NEXT_PUBLIC_SANITY_DATASET
         env:
-          NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
+          NEXT_PUBLIC_SANITY_DATASET: ${{ vars.NEXT_PUBLIC_SANITY_DATASET }}
         run: |
           echo "🛠 Validating NEXT_PUBLIC_SANITY_DATASET availability..."
           if [ -z "${NEXT_PUBLIC_SANITY_DATASET+x}" ]; then
@@ -41,7 +41,7 @@ jobs:
       - name: Deploy to Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
+          NEXT_PUBLIC_SANITY_DATASET: ${{ vars.NEXT_PUBLIC_SANITY_DATASET }}
         run: |
           echo "🚀 Deploying to Vercel (non-interactive)..."
           npx vercel --token "$VERCEL_TOKEN" --prod --yes --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET"
