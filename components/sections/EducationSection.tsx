@@ -2,7 +2,7 @@ import { IconAward, IconCalendar, IconExternalLink } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { defineQuery } from "next-sanity";
-import { urlFor } from "@/sanity/lib/image";
+import { getImageUrl } from "@/sanity/lib/image";
 import { sanityFetch } from "@/sanity/lib/live";
 
 const EDUCATION_QUERY =
@@ -76,16 +76,25 @@ export async function EducationSection() {
               <div className="relative z-10 p-6">
                 {/* Header with logo and basic info */}
                 <div className="flex items-start gap-4 mb-4">
-                  {edu.logo && (
-                    <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-primary/20 shrink-0 group-hover:border-primary/40 transition-colors">
-                      <Image
-                        src={urlFor(edu.logo).width(64).height(64).url()}
-                        alt={`${edu.institution} logo`}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
+                  {(() => {
+                    const logoUrl = getImageUrl(edu.logo, {
+                      width: 64,
+                      height: 64,
+                    });
+
+                    if (!logoUrl) return null;
+
+                    return (
+                      <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-primary/20 shrink-0 group-hover:border-primary/40 transition-colors">
+                        <Image
+                          src={logoUrl}
+                          alt={`${edu.institution} logo`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    );
+                  })()}
 
                   <div className="flex-1 min-w-0">
                     <h3 className="text-xl font-bold mb-1 line-clamp-2 group-hover:text-primary transition-colors">

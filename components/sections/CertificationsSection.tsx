@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { defineQuery } from "next-sanity";
 import { CometCard } from "@/components/ui/comet-card";
-import { urlFor } from "@/sanity/lib/image";
+import { getImageUrl } from "@/sanity/lib/image";
 import { sanityFetch } from "@/sanity/lib/live";
 
 const CERTIFICATIONS_QUERY =
@@ -134,23 +134,29 @@ export async function CertificationsSection() {
                       )}
 
                       {/* Logo Badge */}
-                      {cert.logo && (
-                        <div className="relative mb-5 flex items-center justify-center">
-                          <div className="relative w-16 h-16 p-2 bg-white/10 rounded-full border border-yellow-600/30">
-                            <div className="relative w-full h-full">
-                              <Image
-                                src={urlFor(cert.logo)
-                                  .width(64)
-                                  .height(64)
-                                  .url()}
-                                alt={`${cert.name} badge`}
-                                fill
-                                className="object-contain"
-                              />
+                      {(() => {
+                        const logoUrl = getImageUrl(cert.logo, {
+                          width: 64,
+                          height: 64,
+                        });
+
+                        if (!logoUrl) return null;
+
+                        return (
+                          <div className="relative mb-5 flex items-center justify-center">
+                            <div className="relative w-16 h-16 p-2 bg-white/10 rounded-full border border-yellow-600/30">
+                              <div className="relative w-full h-full">
+                                <Image
+                                  src={logoUrl}
+                                  alt={`${cert.name} badge`}
+                                  fill
+                                  className="object-contain"
+                                />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
 
                       {/* Issued By */}
                       <div className="mb-4">

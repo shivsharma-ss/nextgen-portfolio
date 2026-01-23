@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { defineQuery } from "next-sanity";
-import { urlFor } from "@/sanity/lib/image";
+import { getImageUrl } from "@/sanity/lib/image";
 import { sanityFetch } from "@/sanity/lib/live";
 
 const BLOG_QUERY = defineQuery(`*[_type == "blog"] | order(publishedAt desc){
@@ -51,19 +51,25 @@ export async function BlogSection() {
                 key={post.slug?.current}
                 className="@container/card group bg-card border rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300"
               >
-                {post.featuredImage && (
-                  <div className="relative aspect-video overflow-hidden bg-muted">
-                    <Image
-                      src={urlFor(post.featuredImage)
-                        .width(600)
-                        .height(400)
-                        .url()}
-                      alt={post.title || "Blog post"}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                )}
+                {(() => {
+                  const featuredImageUrl = getImageUrl(post.featuredImage, {
+                    width: 600,
+                    height: 400,
+                  });
+
+                  if (!featuredImageUrl) return null;
+
+                  return (
+                    <div className="relative aspect-video overflow-hidden bg-muted">
+                      <Image
+                        src={featuredImageUrl}
+                        alt={post.title || "Blog post"}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  );
+                })()}
 
                 {/* Content */}
                 <div className="p-4 @md/card:p-6 space-y-3 @md/card:space-y-4">

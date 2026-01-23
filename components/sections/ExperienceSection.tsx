@@ -1,7 +1,7 @@
 import { PortableText } from "@portabletext/react";
 import Image from "next/image";
 import { defineQuery } from "next-sanity";
-import { urlFor } from "@/sanity/lib/image";
+import { getImageUrl } from "@/sanity/lib/image";
 import { sanityFetch } from "@/sanity/lib/live";
 
 const EXPERIENCE_QUERY =
@@ -58,16 +58,25 @@ export async function ExperienceSection() {
 
               <div className="@container/card bg-card border rounded-lg p-4 @md/card:p-6 hover:shadow-lg transition-shadow">
                 <div className="flex flex-col @md/card:flex-row @md/card:items-start gap-4 mb-4">
-                  {exp.companyLogo && (
-                    <div className="relative w-12 h-12 @md/card:w-16 @md/card:h-16 rounded-lg overflow-hidden border shrink-0">
-                      <Image
-                        src={urlFor(exp.companyLogo).width(64).height(64).url()}
-                        alt={`${exp.company} company logo`}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
+                  {(() => {
+                    const companyLogoUrl = getImageUrl(exp.companyLogo, {
+                      width: 64,
+                      height: 64,
+                    });
+
+                    if (!companyLogoUrl) return null;
+
+                    return (
+                      <div className="relative w-12 h-12 @md/card:w-16 @md/card:h-16 rounded-lg overflow-hidden border shrink-0">
+                        <Image
+                          src={companyLogoUrl}
+                          alt={`${exp.company} company logo`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    );
+                  })()}
 
                   <div className="flex-1 min-w-0">
                     <h3 className="text-xl @md/card:text-2xl font-semibold line-clamp-2">

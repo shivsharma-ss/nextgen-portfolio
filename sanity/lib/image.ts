@@ -23,3 +23,36 @@ const builder = createImageUrlBuilder({ projectId, dataset });
 export const urlFor = (source: SanityImageSource) => {
   return builder.image(source);
 };
+
+type ImageUrlOptions = {
+  width?: number;
+  height?: number;
+};
+
+/**
+ * Purpose: Safely build an image URL for optional image data.
+ * Main responsibilities: Guard against missing assets and builder errors.
+ * Outputs: Returns a URL string or null when invalid.
+ */
+export const getImageUrl = (
+  source: SanityImageSource | null | undefined,
+  options: ImageUrlOptions = {},
+) => {
+  if (!source) return null;
+
+  try {
+    let imageBuilder = urlFor(source);
+
+    if (typeof options.width === "number") {
+      imageBuilder = imageBuilder.width(options.width);
+    }
+
+    if (typeof options.height === "number") {
+      imageBuilder = imageBuilder.height(options.height);
+    }
+
+    return imageBuilder.url();
+  } catch {
+    return null;
+  }
+};

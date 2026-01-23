@@ -24,6 +24,7 @@ export default defineType({
         list: [
           { title: "Frontend", value: "frontend" },
           { title: "Backend", value: "backend" },
+          { title: "Full-Stack", value: "full-stack" },
           { title: "AI/ML", value: "ai-ml" },
           { title: "DevOps", value: "devops" },
           { title: "Database", value: "database" },

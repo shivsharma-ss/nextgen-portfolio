@@ -2,7 +2,7 @@ import { IconExternalLink, IconStar } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { defineQuery } from "next-sanity";
-import { urlFor } from "@/sanity/lib/image";
+import { getImageUrl } from "@/sanity/lib/image";
 import { sanityFetch } from "@/sanity/lib/live";
 
 const ACHIEVEMENTS_QUERY =
@@ -94,19 +94,28 @@ export async function AchievementsSection() {
                     key={`${achievement.title}-${achievement.date}`}
                     className="@container/card bg-card border-2 border-primary/20 rounded-lg p-6 hover:shadow-lg transition-all hover:scale-[1.02]"
                   >
-                    {achievement.image && (
-                      <div className="relative w-full h-32 @md/card:h-48 mb-4 rounded-lg overflow-hidden">
-                        <Image
-                          src={urlFor(achievement.image)
-                            .width(400)
-                            .height(200)
-                            .url()}
-                          alt={achievement.title || "Achievement"}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    )}
+                    {(() => {
+                      const achievementImageUrl = getImageUrl(
+                        achievement.image,
+                        {
+                          width: 400,
+                          height: 200,
+                        },
+                      );
+
+                      if (!achievementImageUrl) return null;
+
+                      return (
+                        <div className="relative w-full h-32 @md/card:h-48 mb-4 rounded-lg overflow-hidden">
+                          <Image
+                            src={achievementImageUrl}
+                            alt={achievement.title || "Achievement"}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      );
+                    })()}
 
                     <div className="flex flex-col @xs/card:flex-row @xs/card:items-center gap-2 mb-3">
                       {achievement.type && (
@@ -170,19 +179,28 @@ export async function AchievementsSection() {
                     key={`${achievement.title}-${achievement.date}`}
                     className="@container/card bg-card border rounded-lg p-6 hover:shadow-lg transition-all hover:scale-105 flex flex-col"
                   >
-                    {achievement.image && (
-                      <div className="relative w-full h-24 @md/card:h-32 mb-4 rounded-lg overflow-hidden">
-                        <Image
-                          src={urlFor(achievement.image)
-                            .width(300)
-                            .height(128)
-                            .url()}
-                          alt={achievement.title || "Achievement"}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    )}
+                    {(() => {
+                      const achievementImageUrl = getImageUrl(
+                        achievement.image,
+                        {
+                          width: 300,
+                          height: 128,
+                        },
+                      );
+
+                      if (!achievementImageUrl) return null;
+
+                      return (
+                        <div className="relative w-full h-24 @md/card:h-32 mb-4 rounded-lg overflow-hidden">
+                          <Image
+                            src={achievementImageUrl}
+                            alt={achievement.title || "Achievement"}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      );
+                    })()}
 
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-3">

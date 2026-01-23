@@ -3,7 +3,7 @@ import { IconCheck } from "@tabler/icons-react";
 import { Star } from "lucide-react";
 import Image from "next/image";
 import { defineQuery } from "next-sanity";
-import { urlFor } from "@/sanity/lib/image";
+import { getImageUrl } from "@/sanity/lib/image";
 import { sanityFetch } from "@/sanity/lib/live";
 
 const SERVICES_QUERY =
@@ -90,16 +90,25 @@ export async function ServicesSection() {
                     key={service.slug?.current || service.title}
                     className="@container/card bg-card border-2 border-primary/20 rounded-lg p-6 @lg/card:p-8 hover:shadow-xl transition-all hover:scale-[1.02]"
                   >
-                    {service.icon && (
-                      <div className="relative w-12 h-12 @md/card:w-16 @md/card:h-16 mb-4 @md/card:mb-6">
-                        <Image
-                          src={urlFor(service.icon).width(64).height(64).url()}
-                          alt={service.title || "Service"}
-                          fill
-                          className="object-contain"
-                        />
-                      </div>
-                    )}
+                    {(() => {
+                      const iconUrl = getImageUrl(service.icon, {
+                        width: 64,
+                        height: 64,
+                      });
+
+                      if (!iconUrl) return null;
+
+                      return (
+                        <div className="relative w-12 h-12 @md/card:w-16 @md/card:h-16 mb-4 @md/card:mb-6">
+                          <Image
+                            src={iconUrl}
+                            alt={service.title || "Service"}
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      );
+                    })()}
 
                     <h3 className="text-xl @md/card:text-2xl font-bold mb-3">
                       {service.title}
@@ -198,16 +207,25 @@ export async function ServicesSection() {
                     key={service.slug?.current || service.title}
                     className="@container/card bg-card border rounded-lg p-6 hover:shadow-lg transition-all hover:scale-105 flex flex-col"
                   >
-                    {service.icon && (
-                      <div className="relative w-10 h-10 @md/card:w-12 @md/card:h-12 mb-4">
-                        <Image
-                          src={urlFor(service.icon).width(48).height(48).url()}
-                          alt={service.title || "Service"}
-                          fill
-                          className="object-contain"
-                        />
-                      </div>
-                    )}
+                    {(() => {
+                      const iconUrl = getImageUrl(service.icon, {
+                        width: 48,
+                        height: 48,
+                      });
+
+                      if (!iconUrl) return null;
+
+                      return (
+                        <div className="relative w-10 h-10 @md/card:w-12 @md/card:h-12 mb-4">
+                          <Image
+                            src={iconUrl}
+                            alt={service.title || "Service"}
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      );
+                    })()}
 
                     <h3 className="text-lg @md/card:text-xl font-bold mb-2">
                       {service.title}

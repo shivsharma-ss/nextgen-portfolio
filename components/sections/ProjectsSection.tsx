@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { defineQuery } from "next-sanity";
-import { urlFor } from "@/sanity/lib/image";
+import { getImageUrl } from "@/sanity/lib/image";
 import { sanityFetch } from "@/sanity/lib/live";
 
 const PROJECTS_QUERY =
@@ -41,21 +41,27 @@ export async function ProjectsSection() {
                 className="@container/card group bg-card border rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300"
               >
                 {/* Project Image */}
-                {project.coverImage && (
-                  <div className="relative aspect-video overflow-hidden bg-muted">
-                    <Image
-                      src={urlFor(project.coverImage)
-                        .width(600)
-                        .height(400)
-                        .url()}
-                      alt={project.title || "Project image"}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    {/* Glass overlay that fades on hover */}
-                    <div className="absolute inset-0 bg-background/40 backdrop-blur-[2px] group-hover:opacity-0 transition-opacity duration-300" />
-                  </div>
-                )}
+                {(() => {
+                  const coverImageUrl = getImageUrl(project.coverImage, {
+                    width: 600,
+                    height: 400,
+                  });
+
+                  if (!coverImageUrl) return null;
+
+                  return (
+                    <div className="relative aspect-video overflow-hidden bg-muted">
+                      <Image
+                        src={coverImageUrl}
+                        alt={project.title || "Project image"}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      {/* Glass overlay that fades on hover */}
+                      <div className="absolute inset-0 bg-background/40 backdrop-blur-[2px] group-hover:opacity-0 transition-opacity duration-300" />
+                    </div>
+                  );
+                })()}
 
                 {/* Project Content */}
                 <div className="p-4 @md/card:p-6 space-y-3 @md/card:space-y-4">
@@ -78,7 +84,7 @@ export async function ProjectsSection() {
                   {/* Tech Stack */}
                   {project.technologies && project.technologies.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 @md/card:gap-2">
-                      {project.technologies.slice(0, 4).map((tech, idx) => {
+                      {project.technologies.map((tech, idx) => {
                         const techData =
                           tech && typeof tech === "object" && "name" in tech
                             ? tech
@@ -92,11 +98,6 @@ export async function ProjectsSection() {
                           </span>
                         ) : null;
                       })}
-                      {project.technologies.length > 4 && (
-                        <span className="text-xs px-2 py-0.5 @md/card:py-1 rounded-md bg-muted">
-                          +{project.technologies.length - 4}
-                        </span>
-                      )}
                     </div>
                   )}
 

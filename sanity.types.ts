@@ -410,7 +410,7 @@ export type Skill = {
   _updatedAt: string;
   _rev: string;
   name?: string;
-  category?: "frontend" | "backend" | "ai-ml" | "devops" | "database" | "mobile" | "cloud" | "testing" | "design" | "tools" | "soft-skills" | "other";
+  category?: "frontend" | "backend" | "full-stack" | "ai-ml" | "devops" | "database" | "mobile" | "cloud" | "testing" | "design" | "tools" | "soft-skills" | "other";
   proficiency?: "beginner" | "intermediate" | "advanced" | "expert";
   percentage?: number;
   yearsOfExperience?: number;
@@ -1078,7 +1078,7 @@ export type CERTIFICATIONS_QUERYResult = Array<{
   description: string | null;
   skills: Array<{
     name: string | null;
-    category: "ai-ml" | "backend" | "cloud" | "database" | "design" | "devops" | "frontend" | "mobile" | "other" | "soft-skills" | "testing" | "tools" | null;
+    category: "ai-ml" | "backend" | "cloud" | "database" | "design" | "devops" | "frontend" | "full-stack" | "mobile" | "other" | "soft-skills" | "testing" | "tools" | null;
   }> | null;
   order: number | null;
 }>;
@@ -1179,7 +1179,7 @@ export type EXPERIENCE_QUERYResult = Array<{
   achievements: Array<string> | null;
   technologies: Array<{
     name: string | null;
-    category: "ai-ml" | "backend" | "cloud" | "database" | "design" | "devops" | "frontend" | "mobile" | "other" | "soft-skills" | "testing" | "tools" | null;
+    category: "ai-ml" | "backend" | "cloud" | "database" | "design" | "devops" | "frontend" | "full-stack" | "mobile" | "other" | "soft-skills" | "testing" | "tools" | null;
   }> | null;
   companyLogo: {
     asset?: {
@@ -1323,7 +1323,7 @@ export type PROJECTS_QUERYResult = Array<{
   } | null;
   technologies: Array<{
     name: string | null;
-    category: "ai-ml" | "backend" | "cloud" | "database" | "design" | "devops" | "frontend" | "mobile" | "other" | "soft-skills" | "testing" | "tools" | null;
+    category: "ai-ml" | "backend" | "cloud" | "database" | "design" | "devops" | "frontend" | "full-stack" | "mobile" | "other" | "soft-skills" | "testing" | "tools" | null;
     color: string | null;
   }> | null;
 }>;
@@ -1368,7 +1368,7 @@ export type SERVICES_QUERYResult = Array<{
   features: Array<string> | null;
   technologies: Array<{
     name: string | null;
-    category: "ai-ml" | "backend" | "cloud" | "database" | "design" | "devops" | "frontend" | "mobile" | "other" | "soft-skills" | "testing" | "tools" | null;
+    category: "ai-ml" | "backend" | "cloud" | "database" | "design" | "devops" | "frontend" | "full-stack" | "mobile" | "other" | "soft-skills" | "testing" | "tools" | null;
   }> | null;
   deliverables: Array<string> | null;
   pricing: {

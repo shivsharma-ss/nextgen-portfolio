@@ -2,7 +2,7 @@ import Link from "next/link";
 import { defineQuery } from "next-sanity";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import { LayoutTextFlip } from "@/components/ui/layout-text-flip";
-import { urlFor } from "@/sanity/lib/image";
+import { getImageUrl } from "@/sanity/lib/image";
 import { sanityFetch } from "@/sanity/lib/live";
 import { ProfileImage } from "./ProfileImage";
 
@@ -133,16 +133,22 @@ export async function HeroSection() {
             </div>
 
             {/* Profile Image */}
-            {profile.profileImage && (
-              <ProfileImage
-                imageUrl={urlFor(profile.profileImage)
-                  .width(600)
-                  .height(600)
-                  .url()}
-                firstName={profile.firstName || ""}
-                lastName={profile.lastName || ""}
-              />
-            )}
+            {(() => {
+              const profileImageUrl = getImageUrl(profile.profileImage, {
+                width: 600,
+                height: 600,
+              });
+
+              if (!profileImageUrl) return null;
+
+              return (
+                <ProfileImage
+                  imageUrl={profileImageUrl}
+                  firstName={profile.firstName || ""}
+                  lastName={profile.lastName || ""}
+                />
+              );
+            })()}
           </div>
         </div>
       </div>
