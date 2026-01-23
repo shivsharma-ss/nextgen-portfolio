@@ -23,6 +23,21 @@ jobs:
           # will print who the token belongs to or exit non-zero if invalid
           npx vercel whoami --token "$VERCEL_TOKEN"
 
+      - name: Validate NEXT_PUBLIC_SANITY_DATASET
+        env:
+          NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
+        run: |
+          echo "🛠 Validating NEXT_PUBLIC_SANITY_DATASET availability..."
+          if [ -z "${NEXT_PUBLIC_SANITY_DATASET+x}" ]; then
+            echo "::error::NEXT_PUBLIC_SANITY_DATASET is UNSET (no repository secret found)."
+            exit 1
+          fi
+          if [ -z "$NEXT_PUBLIC_SANITY_DATASET" ]; then
+            echo "::error::NEXT_PUBLIC_SANITY_DATASET is defined but EMPTY."
+            exit 1
+          fi
+          echo "::notice::NEXT_PUBLIC_SANITY_DATASET is set (value: ${NEXT_PUBLIC_SANITY_DATASET})."
+
       - name: Deploy to Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
