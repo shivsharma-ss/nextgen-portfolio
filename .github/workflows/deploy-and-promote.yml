@@ -11,11 +11,11 @@ jobs:
       - name: Deploy to Vercel
         run: |
           echo "🚀 Deploying to Vercel..."
-          vercel --prod --force
+          npx vercel --prod --force
       - name: Promote production domain
         run: |
           echo "📢 Promoting shivansh-sharma.vercel.app as production..."
-          vercel promote --target production https://shivansh-portfolio-l503zdxis-shivansh-sharmas-projects-e8c05f0b.vercel.app --yes
+          npx vercel promote --target production https://shivansh-portfolio-l503zdxis-shivansh-sharmas-projects-e8c05f0b.vercel.app --yes
           echo "✅ Production promotion complete"
 
 permissions:
