@@ -11,7 +11,7 @@ jobs:
       - name: Deploy to Vercel
         run: |
           echo "🚀 Deploying to Vercel..."
-          npx vercel --prod --force
+          npx vercel --prod --force --yes
       - name: Promote production domain
         run: |
           echo "📢 Promoting shivansh-sharma.vercel.app as production..."
