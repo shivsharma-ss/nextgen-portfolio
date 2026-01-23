@@ -58,8 +58,33 @@ export const structure: StructureResolver = (S) =>
               S.listItem()
                 .title("Skills")
                 .icon(AsteriskIcon)
-                .schemaType("skill")
-                .child(S.documentTypeList("skill").title("Skills")),
+                .child(
+                  S.list()
+                    .title("Skills Management")
+                    .items([
+                      S.listItem()
+                        .title("Skill Categories")
+                        .icon(ProjectsIcon)
+                        .schemaType("skillCategory")
+                        .child(
+                          S.documentTypeList("skillCategory").title(
+                            "Skill Categories",
+                          ),
+                        ),
+
+                      S.divider(),
+
+                      S.listItem()
+                        .title("Individual Skills")
+                        .icon(AsteriskIcon)
+                        .schemaType("skill")
+                        .child(
+                          S.documentTypeList("skill").title(
+                            "Individual Skills",
+                          ),
+                        ),
+                    ]),
+                ),
 
               S.listItem()
                 .title("Services")
