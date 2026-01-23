@@ -8,21 +8,36 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Vercel
-        run: |
-          echo "🚀 Deploying to Vercel..."
-          npx vercel --prod --force --yes
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Vercel token
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          
+        run: |
+          echo "🔐 Validating VERCEL_TOKEN..."
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "ERROR: VERCEL_TOKEN is not set (check repository secrets)" >&2
+            exit 1
+          fi
+          # will print who the token belongs to or exit non-zero if invalid
+          npx vercel whoami --token "$VERCEL_TOKEN"
+
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          echo "🚀 Deploying to Vercel (non-interactive)..."
+          npx vercel --token "$VERCEL_TOKEN" --prod --confirm
+
       - name: Promote production domain
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           echo "📢 Promoting shivansh-sharma.vercel.app as production..."
-          npx vercel promote --target production https://shivansh-portfolio-l503zdxis-shivansh-sharmas-projects-e8c05f0b.vercel.app --yes
+          npx vercel promote --token "$VERCEL_TOKEN" --target production https://shivansh-portfolio-l503zdxis-shivansh-sharmas-projects-e8c05f0b.vercel.app --confirm
           echo "✅ Production promotion complete"
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
-permissions:
-  contents: read
-  id-token: write
+    permissions:
+      contents: read
+      id-token: write
