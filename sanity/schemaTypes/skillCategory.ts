@@ -52,14 +52,15 @@ export default defineType({
     select: {
       title: "name",
       order: "order",
-      skillCount: "skills.length",
+      skills: "skills",
     },
     /**
      * Purpose: Format the preview listing for skill category documents.
      * Main responsibilities: Build a title with skill count and show order.
      * Inputs/outputs: Receives selection and returns preview metadata.
      */
-    prepare({ title, order, skillCount }) {
+    prepare({ title, order, skills }) {
+      const skillCount = Array.isArray(skills) ? skills.length : 0;
       return {
         title: `${title} (${skillCount} skills)`,
         subtitle: `Order: ${order}`,
