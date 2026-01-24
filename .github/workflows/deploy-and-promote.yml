@@ -45,12 +45,9 @@ jobs:
           NEXT_PUBLIC_SANITY_DATASET: ${{ vars.NEXT_PUBLIC_SANITY_DATASET }}
         run: |
           echo "🚀 Deploying to Vercel (non-interactive)..."
-          # Create vercel.json to ensure correct project linking
-          cat > vercel.json << 'EOF'
-          {
-            "projectId": "prj_UIJYujxvcutT9Y1uRVG2KHsAIlON"
-          }
-          EOF
+          # Use VERCEL_PROJECT_ID to ensure correct project
+          VERCEL_PROJECT_ID=prj_UIJYujxvcutT9Y1uRVG2KHsAIlON
+          export VERCEL_PROJECT_ID
           
           DEPLOY_OUTPUT=$(npx vercel --token "$VERCEL_TOKEN" --prod --yes --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET" --env SANITY_STUDIO_DATASET="$NEXT_PUBLIC_SANITY_DATASET")
           echo "$DEPLOY_OUTPUT"
