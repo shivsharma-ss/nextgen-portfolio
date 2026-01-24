@@ -65,6 +65,7 @@ export const structure: StructureResolver = (S) =>
                       S.listItem()
                         .title("Skill Categories")
                         .icon(ProjectsIcon)
+                        .id("skill-categories-menu") // Force menu refresh
                         .schemaType("skillCategory")
                         .child(
                           S.documentTypeList("skillCategory").title(

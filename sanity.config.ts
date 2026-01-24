@@ -22,7 +22,8 @@ export default defineConfig({
   dataset,
   title: "Portfolio Studio",
   subtitle: "Content Management",
-  // Version: 1.2.1 - Force schema refresh for skill categories visibility
+  // Version: 1.3.0 - Force schema refresh for skill categories visibility
+  // Cache buster: 2026-01-24T15:10:00Z
   // Custom studio icon
   icon: RocketIcon,
 
