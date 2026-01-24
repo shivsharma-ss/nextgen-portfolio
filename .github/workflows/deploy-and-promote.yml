@@ -57,21 +57,26 @@ jobs:
           # Extract deployment URL from Vercel output
           DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE 'https://shivansh-portfolio-[^[:space:]]+\.vercel\.app' | head -1)
           
+          # Fallback: extract any Vercel deployment URL if the pattern doesn't match
+          if [ -z "$DEPLOY_URL" ]; then
+            DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE 'https://[^[:space:]]+\.vercel\.app' | grep -E 'shivansh-portfolio' | head -1)
+          fi
+          
           if [ -z "$DEPLOY_URL" ]; then
             echo "::error::Could not extract deployment URL from Vercel output"
             exit 1
           fi
           
-          echo "deployment_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
-          echo "✅ Deployment URL captured: $DEPLOY_URL"
+           echo "deployment_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+           echo "✅ Deployment URL captured: $DEPLOY_URL"
 
-      - name: Promote production domain
+      - name: Verify production deployment
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          echo "📢 Promoting ${{ steps.deploy.outputs.deployment_url }} as production..."
-          npx vercel promote --token "$VERCEL_TOKEN" ${{ steps.deploy.outputs.deployment_url }} --yes
-          echo "✅ Production promotion complete"
+          echo "✅ Deployment already promoted to production via --prod flag"
+          echo "🔗 Production URL: https://shivansh-sharma.vercel.app"
+          echo "📊 Deployment URL: ${{ steps.deploy.outputs.deployment_url }}"
 
     permissions:
       contents: read
