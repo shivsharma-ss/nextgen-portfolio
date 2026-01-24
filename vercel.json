@@ -1,5 +1,3 @@
 {
-  "projectId": "prj_UIJYujxvcutT9Y1uRVG2KHsAIlON",
-  "orgId": "team_wDHfgWg4udPZMUsIPpsJZyE6",
-  "name": "shivansh-portfolio"
+  "$schema": "https://openapi.vercel.sh/vercel.json"
 }
