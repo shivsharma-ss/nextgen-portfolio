@@ -1,5 +1,7 @@
 # Schema Deployment Update
-Date: 2026-01-24
+Date: 2026-01-24T15:06:20Z
 Purpose: Force schema refresh for embedded Studios
 
 This file triggers a change to ensure embedded Studios pick up latest schema configuration.
+
+Version: 2.0 - Skill Categories visibility fix
