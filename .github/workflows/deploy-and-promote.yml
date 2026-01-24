@@ -45,8 +45,6 @@ jobs:
           NEXT_PUBLIC_SANITY_DATASET: ${{ vars.NEXT_PUBLIC_SANITY_DATASET }}
         run: |
           echo "🚀 Deploying to Vercel (non-interactive)..."
-          # Link to correct project first
-          npx vercel --token "$VERCEL_TOKEN" --confirm link shivansh-sharmas-projects-e8c05f0b/shivansh-portfolio
           DEPLOY_OUTPUT=$(npx vercel --token "$VERCEL_TOKEN" --prod --yes --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET" --env SANITY_STUDIO_DATASET="$NEXT_PUBLIC_SANITY_DATASET")
           echo "$DEPLOY_OUTPUT"
           
