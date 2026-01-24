@@ -50,6 +50,9 @@ jobs:
           VERCEL_PROJECT_ID=prj_UIJYujxvcutT9Y1uRVG2KHsAIlON
           export VERCEL_ORG_ID VERCEL_PROJECT_ID
           
+          # Ensure project is properly linked before deployment
+          npx vercel --token "$VERCEL_TOKEN" link --confirm --project-id "$VERCEL_PROJECT_ID" --org-id "$VERCEL_ORG_ID"
+          
           DEPLOY_OUTPUT=$(npx vercel --token "$VERCEL_TOKEN" --prod --yes --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET" --env SANITY_STUDIO_DATASET="$NEXT_PUBLIC_SANITY_DATASET")
           echo "$DEPLOY_OUTPUT"
           
