@@ -1,0 +1,63 @@
+name: Manage Custom Domain
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Domain action to perform'
+        required: true
+        default: 'add'
+        type: choice
+        options:
+          - add
+          - remove
+          - list
+      domain:
+        description: 'Domain name (for add/remove actions)'
+        required: false
+        type: string
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+jobs:
+  manage-domain:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Add custom domain
+        if: github.event.inputs.action == 'add'
+        run: |
+          npx vercel --token "$VERCEL_TOKEN" alias add \
+            shivansh-portfolio-gamma.vercel.app \
+            "${{ github.event.inputs.domain }}" \
+            --confirm
+
+      - name: Remove custom domain
+        if: github.event.inputs.action == 'remove'
+        run: |
+          npx vercel --token "$VERCEL_TOKEN" alias rm \
+            "${{ github.event.inputs.domain }}" \
+            --confirm
+
+      - name: List current domains
+        if: github.event.inputs.action == 'list'
+        run: |
+          npx vercel --token "$VERCEL_TOKEN" alias ls
+
+      - name: Verify shivansh-sharma.vercel.app is properly configured
+        run: |
+          echo "Checking current domain aliases..."
+          npx vercel --token "$VERCEL_TOKEN" alias ls | grep shivansh-sharma
