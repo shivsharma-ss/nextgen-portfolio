@@ -45,11 +45,18 @@ jobs:
           NEXT_PUBLIC_SANITY_DATASET: ${{ vars.NEXT_PUBLIC_SANITY_DATASET }}
         run: |
           echo "🚀 Deploying to Vercel (non-interactive)..."
+          # Create vercel.json to ensure correct project linking
+          cat > vercel.json << 'EOF'
+          {
+            "projectId": "prj_UIJYujxvcutT9Y1uRVG2KHsAIlON"
+          }
+          EOF
+          
           DEPLOY_OUTPUT=$(npx vercel --token "$VERCEL_TOKEN" --prod --yes --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET" --env SANITY_STUDIO_DATASET="$NEXT_PUBLIC_SANITY_DATASET")
           echo "$DEPLOY_OUTPUT"
           
           # Extract deployment URL from Vercel output
-          DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE 'https://[^[:space:]]+\.vercel\.app' | head -1)
+          DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE 'https://shivansh-portfolio-[^[:space:]]+\.vercel\.app' | head -1)
           
           if [ -z "$DEPLOY_URL" ]; then
             echo "::error::Could not extract deployment URL from Vercel output"
