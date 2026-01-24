@@ -22,7 +22,7 @@ export default defineConfig({
   dataset,
   title: "Portfolio Studio",
   subtitle: "Content Management",
-
+  // Version: 1.2.1 - Force schema refresh for skill categories visibility
   // Custom studio icon
   icon: RocketIcon,
 
@@ -36,7 +36,9 @@ export default defineConfig({
     }),
     presentationTool({
       previewUrl: {
-        initial: process.env.SANITY_STUDIO_PREVIEW_ORIGIN,
+        initial:
+          process.env.SANITY_STUDIO_PREVIEW_ORIGIN ||
+          "https://shivansh-sharma.vercel.app",
         preview: "/",
         previewMode: {
           enable: "/api/draft-mode/enable",

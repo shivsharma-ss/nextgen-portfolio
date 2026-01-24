@@ -66,3 +66,4 @@ readme_instructions.md
 sanity.types.ts
 schema.json
 sanity-typegen.json
+.env*.local
