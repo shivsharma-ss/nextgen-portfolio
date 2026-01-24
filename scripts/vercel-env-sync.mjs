@@ -8,10 +8,12 @@ const dryRun = args.includes("--dry-run");
 const onlyEnv = getArgValue(args, "--env");
 
 const config = await loadConfig(configPath);
-const environments = onlyEnv ? [onlyEnv] : config.environments ?? [];
+const environments = onlyEnv ? [onlyEnv] : (config.environments ?? []);
 
 if (!environments.length) {
-  fail("No environments specified. Add environments[] in config or pass --env.");
+  fail(
+    "No environments specified. Add environments[] in config or pass --env.",
+  );
 }
 
 const variables = config.variables ?? {};
