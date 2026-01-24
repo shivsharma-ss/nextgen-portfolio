@@ -64,7 +64,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           echo "📢 Promoting ${{ steps.deploy.outputs.deployment_url }} as production..."
-          npx vercel promote --token "$VERCEL_TOKEN" --target production ${{ steps.deploy.outputs.deployment_url }} --confirm
+          npx vercel promote --token "$VERCEL_TOKEN" ${{ steps.deploy.outputs.deployment_url }} --yes
           echo "✅ Production promotion complete"
 
     permissions:
