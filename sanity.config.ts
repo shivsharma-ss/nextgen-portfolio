@@ -22,9 +22,7 @@ export default defineConfig({
   dataset,
   title: "Portfolio Studio",
   subtitle: "Content Management",
-  // Version: 1.3.0 - Force schema refresh for skill categories visibility
-  // Cache buster: 2026-01-24T15:10:00Z
-  // Custom studio icon
+  // Version: 1.3.0 - Multi-domain preview support
   icon: RocketIcon,
 
   // Add and edit the content schema in the './sanity/schemaTypes' folder
@@ -37,9 +35,24 @@ export default defineConfig({
     }),
     presentationTool({
       previewUrl: {
-        initial:
-          process.env.SANITY_STUDIO_PREVIEW_ORIGIN ||
-          "https://shivansh-sharma.vercel.app",
+        initial: () => {
+          // Client-side detection
+          if (typeof window !== "undefined") {
+            const origin = window.location.origin;
+            if (origin.includes("shivansh-portfolio-gamma.vercel.app")) {
+              return "https://shivansh-portfolio-gamma.vercel.app";
+            }
+            return (
+              process.env.SANITY_STUDIO_PREVIEW_ORIGIN ||
+              "https://shivansh-sharma.vercel.app"
+            );
+          }
+          // Server-side fallback
+          return (
+            process.env.SANITY_STUDIO_PREVIEW_ORIGIN ||
+            "https://shivansh-sharma.vercel.app"
+          );
+        },
         preview: "/",
         previewMode: {
           enable: "/api/draft-mode/enable",

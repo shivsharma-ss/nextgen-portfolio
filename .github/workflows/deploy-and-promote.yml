@@ -54,7 +54,7 @@ jobs:
           DEPLOY_OUTPUT=$(npx vercel --token "$VERCEL_TOKEN" --prod --yes --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET" --env SANITY_STUDIO_DATASET="$NEXT_PUBLIC_SANITY_DATASET")
           VERCEL_STATUS=$?
           if [ "$VERCEL_STATUS" -ne 0 ]; then
-            echo "::error::Vercel deploy failed with exit code $VERCEL_STATUS. Output:\n$DEPLOY_OUTPUT" >&2
+            echo -e "::error::Vercel deploy failed with exit code $VERCEL_STATUS. Output:\n$DEPLOY_OUTPUT" >&2
             exit "$VERCEL_STATUS"
           fi
           echo "$DEPLOY_OUTPUT"
