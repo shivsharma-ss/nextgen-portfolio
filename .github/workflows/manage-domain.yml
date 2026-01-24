@@ -37,19 +37,34 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
+      - name: Validate domain input
+        if: github.event.inputs.action == 'add' || github.event.inputs.action == 'remove'
+        env:
+          ACTION: ${{ github.event.inputs.action }}
+          DOMAIN: ${{ github.event.inputs.domain }}
+        run: |
+          if [ -z "$DOMAIN" ]; then
+            echo "::error::Domain input is required for action '$ACTION'." >&2
+            exit 1
+          fi
+
       - name: Add custom domain
         if: github.event.inputs.action == 'add'
+        env:
+          DOMAIN: ${{ github.event.inputs.domain }}
         run: |
           npx vercel --token "$VERCEL_TOKEN" alias add \
             shivansh-portfolio-gamma.vercel.app \
-            "${{ github.event.inputs.domain }}" \
+            "$DOMAIN" \
             --confirm
 
       - name: Remove custom domain
         if: github.event.inputs.action == 'remove'
+        env:
+          DOMAIN: ${{ github.event.inputs.domain }}
         run: |
           npx vercel --token "$VERCEL_TOKEN" alias rm \
-            "${{ github.event.inputs.domain }}" \
+            "$DOMAIN" \
             --confirm
 
       - name: List current domains
@@ -58,6 +73,7 @@ jobs:
           npx vercel --token "$VERCEL_TOKEN" alias ls
 
       - name: Verify shivansh-sharma.vercel.app is properly configured
+        if: github.event.inputs.action == 'add'
         run: |
           echo "Checking current domain aliases..."
           npx vercel --token "$VERCEL_TOKEN" alias ls | grep shivansh-sharma
