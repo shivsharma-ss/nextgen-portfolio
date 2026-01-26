@@ -133,6 +133,10 @@ Manage site-wide metadata (Title, Description, SEO) from a single configuration 
 Live preview allows editors to click on any element (e.g., "50+ Projects") and jump instantly to the corresponding data field.
 ![Presentation Mode](docs/screenshots/14-studio-presentation.png)
 
+### Chat Usage Governance
+
+The Studio now ships a `chatUsageLimits` document type that lets editors tune session/message quotas for anonymous and authenticated visitors (sessions per day, message caps, cooldown windows, etc.). The front-end keeps a stable visitor identity using `VisitorBootstrap` (localStorage + cookies) and consults the `/api/chat/usage` endpoint, which merges that identity with Sanity-driven limits while recording consumption in a lightweight SQLite store (`lib/db`). That telemetry powers the chat experience, usage indicators, and the QA/fallback procedures outlined in the `docs/QA_IMPLEMENTATION_SUMMARY.md` and `docs/MANUAL_QA_PLAYBOOK.md` runbooks.
+
 ---
 
 
@@ -163,11 +167,15 @@ Follow these steps to get the project running locally in under 5 minutes.
 3.  **Configure Environment**
     Create a `.env.local` file in the root. You will need your Project ID and Dataset from Sanity.
     ```env
-    NEXT_PUBLIC_SANITY_PROJECT_ID="your_project_id"
-    NEXT_PUBLIC_SANITY_DATASET="production"
+    NEXT_PUBLIC_SANITY_PROJECT_ID="mdokvla9"
+    NEXT_PUBLIC_SANITY_DATASET="develop"
     NEXT_PUBLIC_SANITY_API_VERSION="2024-02-05"
     NEXT_PUBLIC_URL="http://localhost:3000"
+    SANITY_STUDIO_PROJECT_ID="mdokvla9"
+    SANITY_STUDIO_DATASET="develop"
     ```
+
+    When running `sanity` CLI commands (typegen, dataset migrations, etc.), export or source `SANITY_STUDIO_PROJECT_ID`/`SANITY_STUDIO_DATASET` before executing so they target the `mdokvla9` project and `develop` dataset.
 
 4.  **Run Development Server**
     ```bash
@@ -208,6 +216,10 @@ nextgen-portfolio/
 *   **Secret Management**: All API keys and tokens are strictly handled via server-side environment variables. No secrets are exposed to the client bundle.
 *   **Data Privacy**: The application is designed to be GDPR-compliant friendly. The contact form does not store PII indefinitely unless configured to do so in the backend. Dependencies are regularly audited via `npm audit`.
 
+### Manual QA & Runbooks
+*   **Operational Guides**: `docs/MANUAL_QA_PLAYBOOK.md`, `docs/QA_IMPLEMENTATION_SUMMARY.md`, and `docs/CLERK_MIDDLEWARE_ANALYSIS.md` document why the chat usage limits exist, how to manually verify them, and what to look for when extending the Clerk middleware flow.
+*   **Usage Telemetry**: The `/app/api/chat/usage` and `lib/usage` helpers provide introspection points you can spin up locally to confirm the SQLite-backed counters behave before promoting changes to production.
+
 ### Roadmap
 *   [ ] **i18n Support**: Full internationalization for German/English switching.
 *   [ ] **Dark Mode Toggle**: Persistent user preference for theme.
@@ -219,4 +231,3 @@ nextgen-portfolio/
 **Shivansh Sharma**
 AI Engineer & Full Stack Developer
 [LinkedIn](https://linkedin.com/in/shivsharma-ss/)
-
