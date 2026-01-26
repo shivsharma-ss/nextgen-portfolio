@@ -2,8 +2,11 @@ import { auth } from "@clerk/nextjs/server";
 import { cookies, headers } from "next/headers";
 import { VISITOR_ID_COOKIE_NAME } from "@/components/usage/VisitorBootstrap";
 import { migrateUsageDb } from "@/lib/db/migrate";
-import { openUsageDb } from "@/lib/db/sqlite";
-import { buildUsageStatusResponse } from "@/lib/usage/api";
+import { isUsageDbConfigured, openUsageDb } from "@/lib/db/sqlite";
+import {
+  buildUsageStatusResponse,
+  createUnlimitedUsageStatus,
+} from "@/lib/usage/api";
 import { buildVisitorIdentity } from "@/lib/usage/identity";
 import { selectUsageLimits } from "@/lib/usage/limits";
 import { loadUsageLimitsConfig } from "@/lib/usage/sanityConfig";
@@ -35,6 +38,13 @@ export async function GET() {
     isSignedIn: Boolean(userId),
     config: usageConfig,
   });
+
+  if (!isUsageDbConfigured()) {
+    const fallbackStatus = createUnlimitedUsageStatus();
+    return Response.json(
+      buildUsageStatusResponse({ status: fallbackStatus, limits }),
+    );
+  }
 
   const db = openUsageDb();
   try {

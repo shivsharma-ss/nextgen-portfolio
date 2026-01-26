@@ -10,6 +10,9 @@ const getUsageDbPath = () => {
   return dbPath;
 };
 
+export const isUsageDbConfigured = () =>
+  Boolean(process.env.USAGE_DB_PATH?.trim());
+
 export const openUsageDb = () => {
   const db = new Database(getUsageDbPath());
 

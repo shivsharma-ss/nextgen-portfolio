@@ -6,7 +6,7 @@ type UsageStatusInput = {
   cooldownEndsAt?: number | null;
 };
 
-type UsageStatus = {
+export type UsageStatus = {
   sessionsToday: number;
   messagesToday: number;
   isSessionBlocked: boolean;
@@ -65,3 +65,11 @@ export const buildUsageStatusResponse = ({
     cooldownEndsAt: status.cooldownEndsAt,
   });
 };
+
+export const createUnlimitedUsageStatus = (): UsageStatus => ({
+  sessionsToday: 0,
+  messagesToday: 0,
+  isSessionBlocked: false,
+  isMessageBlocked: false,
+  cooldownEndsAt: null,
+});
