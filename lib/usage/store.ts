@@ -96,31 +96,35 @@ export const createUsageStore = (db: SqliteDatabase) => {
     };
   };
 
-  const recordSession = ({
-    subject,
-    sessionsPerDay,
-    messagesPerDay,
-  }: SessionInput) => {
+  const recordSession = db.transaction((input: SessionInput) => {
     const now = getNowSeconds();
-    ensureVisitor.run(subject, now, now);
-    const status = getStatus({ subject, sessionsPerDay, messagesPerDay });
+    ensureVisitor.run(input.subject, now, now);
+    const status = getStatus({
+      subject: input.subject,
+      sessionsPerDay: input.sessionsPerDay,
+      messagesPerDay: input.messagesPerDay,
+    });
     if (status.isSessionBlocked) {
       return;
     }
 
-    insertUsage.run(randomUUID(), subject, "session", now);
-  };
+    insertUsage.run(randomUUID(), input.subject, "session", now);
+  });
 
-  const recordMessage = ({ subject, messagesPerDay }: MessageInput) => {
+  const recordMessage = db.transaction((input: MessageInput) => {
     const now = getNowSeconds();
-    ensureVisitor.run(subject, now, now);
-    const { messagesToday } = getCounts(subject);
-    if (messagesToday >= messagesPerDay) {
+    ensureVisitor.run(input.subject, now, now);
+    const status = getStatus({
+      subject: input.subject,
+      sessionsPerDay: Number.MAX_SAFE_INTEGER,
+      messagesPerDay: input.messagesPerDay,
+    });
+    if (status.isMessageBlocked) {
       return;
     }
 
-    insertUsage.run(randomUUID(), subject, "message", now);
-  };
+    insertUsage.run(randomUUID(), input.subject, "message", now);
+  });
 
   return {
     getStatus,

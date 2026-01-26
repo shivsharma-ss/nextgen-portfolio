@@ -19,10 +19,15 @@ export async function fetchUsageLimitsConfig({
     cooldownHours
   }`;
 
-  const { data } = await sanityFetch({
+  const sanityOptions: Parameters<typeof sanityFetch>[0] & {
+    revalidate?: number | false;
+  } = {
     query,
     params: { id: "singleton-chatUsageLimits" },
-  });
+    revalidate,
+  };
+
+  const { data } = await sanityFetch(sanityOptions);
 
   const doc = data as UsageLimitsDoc | null;
 

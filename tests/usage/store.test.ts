@@ -70,6 +70,8 @@ test("recordSession enforces cooldown after daily limit reached", () => {
     messagesPerDay: 5,
   };
 
+  const expectedCooldown = getStartOfNextDay();
+
   store.recordSession(input);
   store.recordSession(input);
   store.recordSession(input);
@@ -82,7 +84,7 @@ test("recordSession enforces cooldown after daily limit reached", () => {
 
   assert.equal(status.sessionsToday, 2);
   assert.equal(status.isSessionBlocked, true);
-  assert.equal(status.cooldownEndsAt, getStartOfNextDay());
+  assert.equal(status.cooldownEndsAt, expectedCooldown);
 
   db.close();
 });

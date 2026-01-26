@@ -27,12 +27,17 @@ export function ProfileImage({
   const { isSignedIn } = useUser();
   const { openSignIn } = useClerk();
   const [usage, setUsage] = useState<UsageStatusResponse | null>(null);
+  const [usageError, setUsageError] = useState<Error | null>(null);
 
   const { isUsageLimited, shouldGateWithSignIn, tooltipText } =
     getProfileImageUsageState({
       isSignedIn: Boolean(isSignedIn),
       usage,
     });
+
+  const tooltipTextWithError = usageError
+    ? `${tooltipText} (usage data unavailable)`
+    : tooltipText;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -47,9 +52,13 @@ export function ProfileImage({
         }
         setUsage(payload);
       } catch (error) {
-        if (controller.signal.aborted) return;
-        if (error instanceof DOMException && error.name === "AbortError")
-          return;
+          if (controller.signal.aborted) return;
+          if (error instanceof DOMException && error.name === "AbortError")
+            return;
+          console.error(error);
+          setUsageError(
+            error instanceof Error ? error : new Error("Usage fetch failed"),
+          );
       }
     })();
 
@@ -92,7 +101,7 @@ export function ProfileImage({
           ? "Sign in to continue chatting"
           : "Toggle AI Chat Sidebar"
       }
-      title={tooltipText}
+      title={tooltipTextWithError}
     >
       <Image
         src={imageUrl}

@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import path from "node:path";
+import { existsSync } from "node:fs";
 
 /**
  * API Validation Tests for Usage Limits
@@ -80,18 +82,29 @@ test("API Configuration Validation", () => {
   const expectedApiRoutes = [
     "/api/chat/create-session",
     "/api/chat/send-message",
-    "/api/usage/status",
+    "/api/chat/usage",
   ];
 
   expectedApiRoutes.forEach((route) => {
     assert.ok(route.startsWith("/api/"), `${route} should be an API route`);
-    assert.ok(route.length > 5, `${route} should be a valid route name`);
+    const routeSegments = route.replace(/^\/api\//, "").split("/");
+    const routeFilePath = path.join(
+      process.cwd(),
+      "app",
+      "api",
+      ...routeSegments,
+      "route.ts",
+    );
+    assert.ok(
+      existsSync(routeFilePath),
+      `Expected route file exists for ${route}`,
+    );
   });
 
   console.log("✅ API configuration validation completed successfully");
 });
 
-test("Manual Testing Data Validation", () => {
+test("Manual Testing Data Matches Config", () => {
   // Test data points that should be verified during manual testing
 
   const freeUserTestData = {
@@ -117,21 +130,22 @@ test("Manual Testing Data Validation", () => {
     ],
   };
 
-  // Validate free user test data
+  const { FREE_LIMITS, AUTH_LIMITS } = require("@/lib/usage/config");
+
   assert.equal(
     freeUserTestData.expectedSessions,
-    3,
-    "Free user should expect 3 sessions",
+    FREE_LIMITS.sessionsPerDay,
+    "Free user should expect the configured number of sessions",
   );
   assert.equal(
     freeUserTestData.expectedMessages,
-    20,
-    "Free user should expect 20 messages",
+    FREE_LIMITS.messagesPerDay,
+    "Free user should expect the configured number of messages",
   );
   assert.equal(
     freeUserTestData.blockedAfterSessions,
-    4,
-    "Free user should be blocked on 4th session",
+    FREE_LIMITS.sessionsPerDay + 1,
+    "Free user should be blocked on the session after the limit",
   );
   assert.equal(
     freeUserTestData.testMessages.length,
@@ -139,21 +153,20 @@ test("Manual Testing Data Validation", () => {
     "Should have 3 test messages for free user",
   );
 
-  // Validate authenticated user test data
   assert.equal(
     authUserTestData.expectedSessions,
-    10,
-    "Auth user should expect 10 sessions",
+    AUTH_LIMITS.sessionsPerDay,
+    "Auth user should expect the configured number of sessions",
   );
   assert.equal(
     authUserTestData.expectedMessages,
-    50,
-    "Auth user should expect 50 messages",
+    AUTH_LIMITS.messagesPerDay,
+    "Auth user should expect the configured number of messages",
   );
   assert.equal(
     authUserTestData.blockedAfterSessions,
-    11,
-    "Auth user should be blocked on 11th session",
+    AUTH_LIMITS.sessionsPerDay + 1,
+    "Auth user should be blocked one session after the limit",
   );
   assert.equal(
     authUserTestData.testMessages.length,

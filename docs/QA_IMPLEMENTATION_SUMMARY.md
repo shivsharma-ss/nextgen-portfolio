@@ -50,7 +50,7 @@
 
 ### API Endpoints
 - ✅ `/api/chat/create-session` endpoint validation
-- ✅ `/api/usage/status` endpoint validation
+- ✅ `/api/chat/usage` endpoint validation
 - ✅ Network request verification steps
 - ✅ Database usage tracking validation
 

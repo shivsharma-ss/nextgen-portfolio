@@ -218,7 +218,7 @@ nextgen-portfolio/
 
 ### Manual QA & Runbooks
 *   **Operational Guides**: `docs/MANUAL_QA_PLAYBOOK.md`, `docs/QA_IMPLEMENTATION_SUMMARY.md`, and `docs/CLERK_MIDDLEWARE_ANALYSIS.md` document why the chat usage limits exist, how to manually verify them, and what to look for when extending the Clerk middleware flow.
-*   **Usage Telemetry**: The `/app/api/chat/usage` and `lib/usage` helpers provide introspection points you can spin up locally to confirm the SQLite-backed counters behave before promoting changes to production.
+*   **Usage Telemetry**: The `/api/chat/usage` and `lib/usage` helpers provide introspection points you can spin up locally to confirm the SQLite-backed counters behave before promoting changes to production.
 
 ### Roadmap
 *   [ ] **i18n Support**: Full internationalization for German/English switching.

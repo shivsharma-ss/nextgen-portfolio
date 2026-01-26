@@ -1,17 +1,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { NextRequest } from "next/server";
+import { createRequire } from "node:module";
 
 test("new proxy middleware allows guest access to chat API", async () => {
-  // Test that the new middleware allows guest access to /api/chat
-
-  // Remove Clerk env vars to simulate guest access
+  const originalPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const originalSecretKey = process.env.CLERK_SECRET_KEY;
   delete process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   delete process.env.CLERK_SECRET_KEY;
 
-  // Import the new middleware implementation
-  const { default: newProxyMiddleware } = await import("../proxy");
-
+  const require = createRequire(import.meta.url);
   const chatRequest = new NextRequest("http://localhost:3000/api/chat", {
     method: "POST",
     headers: {
@@ -21,24 +19,29 @@ test("new proxy middleware allows guest access to chat API", async () => {
     body: JSON.stringify({ message: "Hello from guest" }),
   });
 
-  let hasError = false;
-  let errorMessage = "";
-
   try {
-    await newProxyMiddleware(chatRequest, {} as any);
-  } catch (error) {
-    hasError = true;
-    errorMessage = (error as Error).message;
-    console.log("New middleware error:", error);
-  }
+    delete require.cache[require.resolve("../proxy")];
+    const { default: newProxyMiddleware } = await import("../proxy");
 
-  // The new middleware should NOT throw for /api/chat even without Clerk config
-  // because /api/chat is defined as a public route
-  assert.equal(
-    hasError,
-    false,
-    "New middleware should allow guest access to /api/chat",
-  );
+    await assert.doesNotReject(
+      async () => {
+        await newProxyMiddleware(chatRequest, {} as any);
+      },
+      "New middleware should allow guest access to /api/chat",
+    );
+  } finally {
+    if (originalPublishableKey === undefined) {
+      delete process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+    } else {
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = originalPublishableKey;
+    }
+    if (originalSecretKey === undefined) {
+      delete process.env.CLERK_SECRET_KEY;
+    } else {
+      process.env.CLERK_SECRET_KEY = originalSecretKey;
+    }
+    delete require.cache[require.resolve("../proxy")];
+  }
 });
 
 test("new proxy middleware allows guest access to homepage", async () => {
@@ -70,17 +73,12 @@ test("new proxy middleware allows guest access to homepage", async () => {
 });
 
 test("new middleware preserves Clerk for protected routes when configured", async () => {
-  // Test that Clerk authentication still works when properly configured
+  const require = createRequire(import.meta.url);
+  const originalPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const originalSecretKey = process.env.CLERK_SECRET_KEY;
 
-  // Mock Clerk environment
   process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = "pk_test_mock_key";
   process.env.CLERK_SECRET_KEY = "sk_test_mock_key";
-
-  const { default: newProxyMiddleware } = await import("../proxy");
-
-  // Import fresh module with environment set
-  // Clear module cache to get fresh import with env vars
-  delete require.cache[require.resolve("../proxy")];
 
   const protectedRequest = new NextRequest("http://localhost:3000/dashboard", {
     method: "GET",
@@ -89,48 +87,61 @@ test("new middleware preserves Clerk for protected routes when configured", asyn
     },
   });
 
-  let hasError = false;
-
   try {
-    await newProxyMiddleware(protectedRequest, {} as any);
-  } catch (error) {
-    hasError = true;
-    // With proper Clerk config, this should handle auth protection
-    // The exact behavior depends on Clerk's implementation
-  }
+    delete require.cache[require.resolve("../proxy")];
+    const { default: newProxyMiddleware } = await import("../proxy");
 
-  // The test verifies the middleware runs without throwing configuration errors
-  // When properly configured with Clerk keys, it should handle authentication
-  assert.ok(true, "Middleware should handle protected routes appropriately");
+    await assert.doesNotReject(async () => {
+      await newProxyMiddleware(protectedRequest, {} as any);
+    });
+  } finally {
+    if (originalPublishableKey === undefined) {
+      delete process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+    } else {
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = originalPublishableKey;
+    }
+    if (originalSecretKey === undefined) {
+      delete process.env.CLERK_SECRET_KEY;
+    } else {
+      process.env.CLERK_SECRET_KEY = originalSecretKey;
+    }
+    delete require.cache[require.resolve("../proxy")];
+  }
 });
 
 test("createSession works with new middleware approach", async () => {
-  // Verify that createSession still works with the new middleware approach
+  const originalFetch = global.fetch;
+  const originalApiKey = process.env.OPENAI_API_KEY;
+  const originalWorkflowId = process.env.WORKFLOW_ID;
 
-  // Mock environment variables
-  process.env.OPENAI_API_KEY = "test-key";
-  process.env.WORKFLOW_ID = "test-workflow";
-
-  // Mock fetch to avoid real API calls
   global.fetch = async () =>
     new Response(JSON.stringify({ client_secret: "test-secret-123" }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     }) as any;
+  process.env.OPENAI_API_KEY = "test-key";
+  process.env.WORKFLOW_ID = "test-workflow";
 
-  // Import createSession
-  const { createSession } = await import("../app/actions/create-session");
-
-  // The function should exist and be callable
-  assert.ok(
-    typeof createSession === "function",
-    "createSession should be available",
-  );
-
-  // The actual execution would require proper Clerk auth mocking
-  // but the function should be importable and the right type
-  assert.ok(
-    createSession.length === 0,
-    "createSession should be an async function with no required params",
-  );
+  try {
+    const { createSession } = await import("../app/actions/create-session");
+    assert.ok(
+      typeof createSession === "function",
+      "createSession should be available",
+    );
+    await assert.rejects(async () => {
+      await createSession();
+    });
+  } finally {
+    global.fetch = originalFetch;
+    if (originalApiKey === undefined) {
+      delete process.env.OPENAI_API_KEY;
+    } else {
+      process.env.OPENAI_API_KEY = originalApiKey;
+    }
+    if (originalWorkflowId === undefined) {
+      delete process.env.WORKFLOW_ID;
+    } else {
+      process.env.WORKFLOW_ID = originalWorkflowId;
+    }
+  }
 });

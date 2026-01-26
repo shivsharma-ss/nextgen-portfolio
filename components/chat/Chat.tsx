@@ -72,14 +72,24 @@ export function Chat({
         logAbortRef.current?.abort();
         const controller = new AbortController();
         logAbortRef.current = controller;
-        const payload = await fetchUsageStatus(fetch, "/api/chat/message", {
-          method: "POST",
-          signal: controller.signal,
-        });
-        if (!payload || controller.signal.aborted || !isMountedRef.current) {
-          return;
+        try {
+          const payload = await fetchUsageStatus(fetch, "/api/chat/message", {
+            method: "POST",
+            signal: controller.signal,
+          });
+          if (!payload || controller.signal.aborted || !isMountedRef.current) {
+            return;
+          }
+          setUsage(payload);
+        } catch (error) {
+          if (
+            controller.signal.aborted ||
+            (error instanceof DOMException && error.name === "AbortError")
+          ) {
+            return;
+          }
+          console.error("Failed to fetch usage status", error);
         }
-        setUsage(payload);
       })();
     },
     // https://chatkit.studio/playground
@@ -153,13 +163,23 @@ export function Chat({
     usageAbortRef.current = controller;
 
     void (async () => {
-      const payload = await fetchUsageStatus(fetch, "/api/chat/usage", {
-        signal: controller.signal,
-      });
-      if (!payload || controller.signal.aborted || !isMountedRef.current) {
-        return;
+      try {
+        const payload = await fetchUsageStatus(fetch, "/api/chat/usage", {
+          signal: controller.signal,
+        });
+        if (!payload || controller.signal.aborted || !isMountedRef.current) {
+          return;
+        }
+        setUsage(payload);
+      } catch (error) {
+        if (
+          controller.signal.aborted ||
+          (error instanceof DOMException && error.name === "AbortError")
+        ) {
+          return;
+        }
+        console.error("Failed to fetch usage status on mount", error);
       }
-      setUsage(payload);
     })();
 
     return () => {

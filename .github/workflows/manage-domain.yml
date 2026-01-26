@@ -76,4 +76,7 @@ jobs:
         if: github.event.inputs.action == 'add'
         run: |
           echo "Checking current domain aliases..."
-          npx vercel --token "$VERCEL_TOKEN" alias ls | grep shivansh-sharma
+          if ! npx vercel --token "$VERCEL_TOKEN" alias ls | grep "$DOMAIN"; then
+            echo "::error::Domain $DOMAIN not found in Vercel aliases" >&2
+            exit 1
+          fi
