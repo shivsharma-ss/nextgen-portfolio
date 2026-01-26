@@ -19,7 +19,7 @@ interface Skill {
 
 interface SkillCategory {
   name: string | null;
-  skills: Skill[];
+  skills: Skill[] | null;
 }
 
 interface SkillsChartProps {
