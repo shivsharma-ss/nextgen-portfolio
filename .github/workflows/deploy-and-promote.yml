@@ -40,49 +40,45 @@ jobs:
 
       - name: Validate Vercel project configuration
         env:
-          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          VERCEL_TEAM_SLUG: ${{ vars.VERCEL_TEAM_SLUG }}
           VERCEL_PROJECT_NAME: ${{ vars.VERCEL_PROJECT_NAME }}
         run: |
           echo "🧭 Validating Vercel project configuration..."
-          if [ -z "${VERCEL_ORG_ID+x}" ] || [ -z "$VERCEL_ORG_ID" ]; then
-            echo "::error::VERCEL_ORG_ID is missing. Set repository variable VERCEL_ORG_ID." >&2
-            exit 1
-          fi
-          if [ -z "${VERCEL_PROJECT_ID+x}" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
-            echo "::error::VERCEL_PROJECT_ID is missing. Set repository variable VERCEL_PROJECT_ID." >&2
+          if [ -z "${VERCEL_TEAM_SLUG+x}" ] || [ -z "$VERCEL_TEAM_SLUG" ]; then
+            echo "::error::VERCEL_TEAM_SLUG is missing. Set repository variable VERCEL_TEAM_SLUG." >&2
             exit 1
           fi
           if [ -z "${VERCEL_PROJECT_NAME+x}" ] || [ -z "$VERCEL_PROJECT_NAME" ]; then
             echo "::error::VERCEL_PROJECT_NAME is missing. Set repository variable VERCEL_PROJECT_NAME." >&2
             exit 1
           fi
-          echo "::notice::Vercel project config OK (org: ${VERCEL_ORG_ID}, project: ${VERCEL_PROJECT_NAME})."
+          echo "::notice::Vercel project config OK (scope: ${VERCEL_TEAM_SLUG}, project: ${VERCEL_PROJECT_NAME})."
 
       - name: Deploy to Vercel
         id: deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           NEXT_PUBLIC_SANITY_DATASET: ${{ vars.NEXT_PUBLIC_SANITY_DATASET }}
-          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          VERCEL_TEAM_SLUG: ${{ vars.VERCEL_TEAM_SLUG }}
           VERCEL_PROJECT_NAME: ${{ vars.VERCEL_PROJECT_NAME }}
         run: |
           echo "🚀 Deploying to Vercel (non-interactive)..."
-          # Use both VERCEL_ORG_ID and VERCEL_PROJECT_ID to ensure correct project
-          VERCEL_ORG_ID="${VERCEL_ORG_ID}"
-          VERCEL_PROJECT_ID="${VERCEL_PROJECT_ID}"
+          # Use explicit scope + project to avoid fallback
+          VERCEL_TEAM_SLUG="${VERCEL_TEAM_SLUG}"
           VERCEL_PROJECT_NAME="${VERCEL_PROJECT_NAME}"
-          export VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_PROJECT_NAME
+          export VERCEL_TEAM_SLUG VERCEL_PROJECT_NAME
 
           # Link explicitly to the correct project/scope to avoid accidental fallback
-          npx vercel link --yes --project "$VERCEL_PROJECT_NAME" --scope "$VERCEL_ORG_ID" --token "$VERCEL_TOKEN"
+          npx vercel link --yes --project "$VERCEL_PROJECT_NAME" --scope "$VERCEL_TEAM_SLUG" --token "$VERCEL_TOKEN"
+
+          # Confirm the intended project is reachable under the provided scope
+          npx vercel project inspect "$VERCEL_PROJECT_NAME" --scope "$VERCEL_TEAM_SLUG" --token "$VERCEL_TOKEN"
 
           # Pull production environment variables to avoid dev/preview drift
-          npx vercel pull --yes --environment=production --scope "$VERCEL_ORG_ID" --token "$VERCEL_TOKEN"
+          npx vercel pull --yes --environment=production --scope "$VERCEL_TEAM_SLUG" --token "$VERCEL_TOKEN"
 
           # Deploy explicitly to the intended project/scope
-          DEPLOY_OUTPUT=$(npx vercel deploy --prod --yes --scope "$VERCEL_ORG_ID" --project "$VERCEL_PROJECT_NAME" --token "$VERCEL_TOKEN" --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET" --env SANITY_STUDIO_DATASET="$NEXT_PUBLIC_SANITY_DATASET")
+          DEPLOY_OUTPUT=$(npx vercel deploy --prod --yes --scope "$VERCEL_TEAM_SLUG" --project "$VERCEL_PROJECT_NAME" --token "$VERCEL_TOKEN" --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET" --env SANITY_STUDIO_DATASET="$NEXT_PUBLIC_SANITY_DATASET")
           VERCEL_STATUS=$?
           if [ "$VERCEL_STATUS" -ne 0 ]; then
             echo -e "::error::Vercel deploy failed with exit code $VERCEL_STATUS. Output:\n$DEPLOY_OUTPUT" >&2
