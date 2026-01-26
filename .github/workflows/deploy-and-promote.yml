@@ -38,6 +38,27 @@ jobs:
           fi
           echo "::notice::NEXT_PUBLIC_SANITY_DATASET is set (value: ${NEXT_PUBLIC_SANITY_DATASET})."
 
+      - name: Validate Vercel project configuration
+        env:
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          VERCEL_PROJECT_NAME: ${{ vars.VERCEL_PROJECT_NAME }}
+        run: |
+          echo "🧭 Validating Vercel project configuration..."
+          if [ -z "${VERCEL_ORG_ID+x}" ] || [ -z "$VERCEL_ORG_ID" ]; then
+            echo "::error::VERCEL_ORG_ID is missing. Set repository variable VERCEL_ORG_ID." >&2
+            exit 1
+          fi
+          if [ -z "${VERCEL_PROJECT_ID+x}" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "::error::VERCEL_PROJECT_ID is missing. Set repository variable VERCEL_PROJECT_ID." >&2
+            exit 1
+          fi
+          if [ -z "${VERCEL_PROJECT_NAME+x}" ] || [ -z "$VERCEL_PROJECT_NAME" ]; then
+            echo "::error::VERCEL_PROJECT_NAME is missing. Set repository variable VERCEL_PROJECT_NAME." >&2
+            exit 1
+          fi
+          echo "::notice::Vercel project config OK (org: ${VERCEL_ORG_ID}, project: ${VERCEL_PROJECT_NAME})."
+
       - name: Deploy to Vercel
         id: deploy
         env:
@@ -45,31 +66,36 @@ jobs:
           NEXT_PUBLIC_SANITY_DATASET: ${{ vars.NEXT_PUBLIC_SANITY_DATASET }}
           VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
-          PROJECT_NAME: ${{ vars.VERCEL_PROJECT_NAME || vars.PROJECT_NAME }}
+          VERCEL_PROJECT_NAME: ${{ vars.VERCEL_PROJECT_NAME }}
         run: |
           echo "🚀 Deploying to Vercel (non-interactive)..."
           # Use both VERCEL_ORG_ID and VERCEL_PROJECT_ID to ensure correct project
           VERCEL_ORG_ID="${VERCEL_ORG_ID}"
           VERCEL_PROJECT_ID="${VERCEL_PROJECT_ID}"
-          export VERCEL_ORG_ID VERCEL_PROJECT_ID
+          VERCEL_PROJECT_NAME="${VERCEL_PROJECT_NAME}"
+          export VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_PROJECT_NAME
 
-          PROJECT_NAME=${PROJECT_NAME:-shivansh-portfolio}
-          
-          # Deploy directly since vercel.json provides explicit project configuration
-          DEPLOY_OUTPUT=$(npx vercel --token "$VERCEL_TOKEN" --prod --yes --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET" --env SANITY_STUDIO_DATASET="$NEXT_PUBLIC_SANITY_DATASET")
+          # Link explicitly to the correct project/scope to avoid accidental fallback
+          npx vercel link --yes --project "$VERCEL_PROJECT_NAME" --scope "$VERCEL_ORG_ID" --token "$VERCEL_TOKEN"
+
+          # Pull production environment variables to avoid dev/preview drift
+          npx vercel pull --yes --environment=production --scope "$VERCEL_ORG_ID" --token "$VERCEL_TOKEN"
+
+          # Deploy explicitly to the intended project/scope
+          DEPLOY_OUTPUT=$(npx vercel deploy --prod --yes --scope "$VERCEL_ORG_ID" --project "$VERCEL_PROJECT_NAME" --token "$VERCEL_TOKEN" --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET" --env SANITY_STUDIO_DATASET="$NEXT_PUBLIC_SANITY_DATASET")
           VERCEL_STATUS=$?
           if [ "$VERCEL_STATUS" -ne 0 ]; then
             echo -e "::error::Vercel deploy failed with exit code $VERCEL_STATUS. Output:\n$DEPLOY_OUTPUT" >&2
             exit "$VERCEL_STATUS"
           fi
           echo "$DEPLOY_OUTPUT"
-          
+
           # Extract deployment URL from Vercel output
-          DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://${PROJECT_NAME}-[^[:space:]]+\.vercel\.app" | head -1)
-          
+          DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://${VERCEL_PROJECT_NAME}-[^[:space:]]+\.vercel\.app" | head -1)
+
           # Fallback: extract any Vercel deployment URL if the pattern doesn't match
           if [ -z "$DEPLOY_URL" ]; then
-            DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE 'https://[^[:space:]]+\.vercel\.app' | grep -E "${PROJECT_NAME}" | head -1)
+            DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE 'https://[^[:space:]]+\.vercel\.app' | grep -E "${VERCEL_PROJECT_NAME}" | head -1)
           fi
           
           if [ -z "$DEPLOY_URL" ]; then
