@@ -12,13 +12,13 @@ import {
   isUsageLimitError,
 } from "@/lib/usage/client";
 import { UsageLimitError } from "@/lib/usage/session";
-import type { CHAT_PROFILE_QUERYResult } from "@/sanity.types";
+import type { CHAT_PROFILE_QUERY_RESULT } from "@/sanity.types";
 import { useSidebar } from "../ui/sidebar";
 
 export function Chat({
   profile,
 }: {
-  profile: CHAT_PROFILE_QUERYResult | null;
+  profile: CHAT_PROFILE_QUERY_RESULT | null;
 }) {
   const { toggleSidebar } = useSidebar();
   const [usage, setUsage] = useState<UsageStatusResponse | null>(null);
