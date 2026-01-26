@@ -78,7 +78,7 @@ jobs:
           npx vercel pull --yes --environment=production --scope "$VERCEL_TEAM_SLUG" --token "$VERCEL_TOKEN"
 
           # Deploy explicitly to the intended project/scope
-          DEPLOY_OUTPUT=$(npx vercel deploy --prod --yes --scope "$VERCEL_TEAM_SLUG" --project "$VERCEL_PROJECT_NAME" --token "$VERCEL_TOKEN" --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET" --env SANITY_STUDIO_DATASET="$NEXT_PUBLIC_SANITY_DATASET")
+          DEPLOY_OUTPUT=$(npx vercel deploy --prod --yes --scope "$VERCEL_TEAM_SLUG" --token "$VERCEL_TOKEN" --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET" --env SANITY_STUDIO_DATASET="$NEXT_PUBLIC_SANITY_DATASET")
           VERCEL_STATUS=$?
           if [ "$VERCEL_STATUS" -ne 0 ]; then
             echo -e "::error::Vercel deploy failed with exit code $VERCEL_STATUS. Output:\n$DEPLOY_OUTPUT" >&2
