@@ -68,7 +68,7 @@ export function ProfileImage({
   }, []);
 
   const handleClick = () => {
-    if (shouldGateWithSignIn) {
+    if (!open && shouldGateWithSignIn) {
       openSignIn();
       return;
     }
