@@ -1,6 +1,5 @@
 "use client";
 
-import { SignInButton, useUser } from "@clerk/nextjs";
 import { MessageSquare, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { UsageStatusResponse } from "@/lib/usage/api";
@@ -9,15 +8,10 @@ import { useSidebar } from "./ui/sidebar";
 
 function SidebarToggle() {
   const { toggleSidebar, open, isMobile, openMobile } = useSidebar();
-  const { isSignedIn } = useUser();
   const [usage, setUsage] = useState<UsageStatusResponse | null>(null);
 
   const isSidebarOpen = isMobile ? openMobile : open;
-  const isUsageLimited = Boolean(usage?.isLimited);
-  const shouldGateWithSignIn = !isSignedIn && isUsageLimited;
-  const tooltipText = shouldGateWithSignIn
-    ? "Daily limit reached — sign in to continue"
-    : "Chat with My AI Twin";
+  const tooltipText = "Chat with My AI Twin";
 
   const buttonStyles = `relative w-16 h-16 rounded-full 
     bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 
@@ -74,26 +68,14 @@ function SidebarToggle() {
         <div className="absolute -bottom-1 right-6 w-2 h-2 rotate-45 bg-white/90 dark:bg-black/90 border-r border-b border-white/40 dark:border-white/20" />
       </div>
 
-      {shouldGateWithSignIn ? (
-        <SignInButton mode="modal">
-          <button
-            type="button"
-            className={buttonStyles}
-            aria-label="Sign in to continue chatting"
-          >
-            <MessageSquare className="h-7 w-7 text-white transition-transform group-hover:scale-110" />
-          </button>
-        </SignInButton>
-      ) : (
-        <button
-          type="button"
-          onClick={toggleSidebar}
-          className={buttonStyles}
-          aria-label="Chat with AI Twin"
-        >
-          <MessageSquare className="h-7 w-7 text-white transition-transform group-hover:scale-110" />
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={toggleSidebar}
+        className={buttonStyles}
+        aria-label="Chat with AI Twin"
+      >
+        <MessageSquare className="h-7 w-7 text-white transition-transform group-hover:scale-110" />
+      </button>
     </div>
   );
 }
