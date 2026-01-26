@@ -15,8 +15,17 @@ type VisitorIdentity = {
 
 const fingerprintDelimiter = "\u0000";
 
-const resolveUsageSalt = () =>
-  process.env.USAGE_SALT ?? process.env.NEXT_PUBLIC_CHATKIT_WORKFLOW_ID ?? "";
+const resolveUsageSalt = () => {
+  if (process.env.USAGE_SALT) {
+    return process.env.USAGE_SALT;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    return "dev-usage-salt";
+  }
+
+  throw new Error("USAGE_SALT is required in production");
+};
 
 export const hashVisitorFingerprint = (
   subjectSeed: string,
@@ -38,7 +47,8 @@ export const buildVisitorIdentity = ({
     return { subject: clerkUserId, tier: "authenticated" };
   }
 
-  const subjectSeed = ip.trim() === "" ? visitorId : ip;
+  const trimmedIp = ip.trim();
+  const subjectSeed = trimmedIp === "" ? visitorId : trimmedIp;
   const hash = hashVisitorFingerprint(subjectSeed, userAgent);
   return { subject: hash, tier: "guest" };
 };

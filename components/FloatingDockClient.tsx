@@ -280,18 +280,15 @@ function DockIcon({
     "group relative flex items-center justify-center w-12 h-12 md:w-12 md:h-12";
 
   return item.isSignInButton ? (
-    <SignInButton mode="modal">
-      <button
-        type="button"
-        className={wrapperClasses}
-        onClick={onItemClick}
-        onKeyDown={
-          onItemClick ? (e) => e.key === "Enter" && onItemClick() : undefined
-        }
-      >
-        {content}
-      </button>
-    </SignInButton>
+      <SignInButton mode="modal">
+        <button
+          type="button"
+          className={wrapperClasses}
+          onClick={onItemClick}
+        >
+          {content}
+        </button>
+      </SignInButton>
   ) : item.onClick ? (
     <button type="button" onClick={handleClick} className={wrapperClasses}>
       {content}

@@ -37,7 +37,7 @@ This playbook provides step-by-step instructions for manually testing the usage 
 4. Refresh the public site and then continue with the remaining tests.
 
 **Verification**:
-- ✅ `/api/usage/status` reflects the updated limits in the response payload.
+- ✅ `/api/chat/usage` reflects the updated limits in the response payload.
 - ✅ Guests/authenticated users observe the new session and message quotas.
 - ✅ The fallback to default limits (3/20 for guests, 10/50 for auth) still applies when the document is unpublished or invalid.
 
@@ -129,7 +129,7 @@ This playbook provides step-by-step instructions for manually testing the usage 
 **For Guests**:
 ```
 POST /api/chat/create-session
-GET /api/usage/status
+GET /api/chat/usage
 ```
 
 **Expected Responses**:
@@ -139,7 +139,7 @@ GET /api/usage/status
 **For Authenticated Users**:
 ```
 POST /api/chat/create-session (with auth headers)
-GET /api/usage/status
+GET /api/chat/usage
 ```
 
 **Expected Responses**:

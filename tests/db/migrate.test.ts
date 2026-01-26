@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, renameSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -10,43 +10,48 @@ import { openUsageDb } from "@/lib/db/sqlite";
 test("migrateUsageDb creates usage tables", async () => {
   const tempDir = mkdtempSync(path.join(tmpdir(), "usage-db-"));
   const dbPath = path.join(tempDir, "usage.sqlite");
+  const originalUsageDbPath = process.env.USAGE_DB_PATH;
   process.env.USAGE_DB_PATH = dbPath;
 
   let migrateUsageDb: (() => void) | undefined;
 
   try {
-    ({ migrateUsageDb } = await import("@/lib/db/migrate"));
-  } catch (error) {
-    assert.fail("migrateUsageDb module is missing");
+    try {
+      ({ migrateUsageDb } = await import("@/lib/db/migrate"));
+    } catch (error) {
+      assert.fail("migrateUsageDb module is missing");
+    }
+
+    if (typeof migrateUsageDb !== "function") {
+      assert.fail("migrateUsageDb export is missing");
+    }
+
+    migrateUsageDb();
+
+    const db = new Database(dbPath);
+    const tableRows = db
+      .prepare("select name from sqlite_master where type = 'table'")
+      .all() as Array<{ name: string }>;
+    const tableNames = tableRows.map((row) => row.name);
+
+    db.close();
+
+    assert.ok(tableNames.includes("usage_visitors"));
+    assert.ok(tableNames.includes("usage_sessions"));
+  } finally {
+    if (originalUsageDbPath === undefined) {
+      delete process.env.USAGE_DB_PATH;
+    } else {
+      process.env.USAGE_DB_PATH = originalUsageDbPath;
+    }
   }
-
-  if (typeof migrateUsageDb !== "function") {
-    assert.fail("migrateUsageDb export is missing");
-  }
-
-  migrateUsageDb();
-
-  const db = new Database(dbPath);
-  const tableRows = db
-    .prepare("select name from sqlite_master where type = 'table'")
-    .all() as Array<{ name: string }>;
-  const tableNames = tableRows.map((row) => row.name);
-
-  db.close();
-
-  assert.ok(tableNames.includes("usage_visitors"));
-  assert.ok(tableNames.includes("usage_sessions"));
 });
 
 test("migrateUsageDb closes db when migration read fails", async (t) => {
   const tempDir = mkdtempSync(path.join(tmpdir(), "usage-db-"));
   const dbPath = path.join(tempDir, "usage.sqlite");
+  const originalUsageDbPath = process.env.USAGE_DB_PATH;
   process.env.USAGE_DB_PATH = dbPath;
-
-  const migrationPath = fileURLToPath(
-    new URL("../../db/migrations/001_usage.sql", import.meta.url),
-  );
-  const backupPath = `${migrationPath}.${Date.now()}.bak`;
 
   const originalClose = Database.prototype.close;
   t.mock.method(
@@ -60,13 +65,24 @@ test("migrateUsageDb closes db when migration read fails", async (t) => {
     mock: { callCount: () => number };
   };
 
-  renameSync(migrationPath, backupPath);
+  const globalFs = globalThis as typeof globalThis & {
+    readFileSync: typeof readFileSync;
+  };
+  const originalReadFileSync = globalFs.readFileSync;
+  globalFs.readFileSync = () => {
+    throw new Error("read failed");
+  };
 
   try {
     const { migrateUsageDb } = await import("@/lib/db/migrate");
-    assert.throws(() => migrateUsageDb());
+    assert.throws(() => migrateUsageDb(), /read failed/);
   } finally {
-    renameSync(backupPath, migrationPath);
+    globalFs.readFileSync = originalReadFileSync;
+    if (originalUsageDbPath === undefined) {
+      delete process.env.USAGE_DB_PATH;
+    } else {
+      process.env.USAGE_DB_PATH = originalUsageDbPath;
+    }
   }
 
   assert.strictEqual(closeSpy.mock.callCount(), 1);
@@ -75,6 +91,7 @@ test("migrateUsageDb closes db when migration read fails", async (t) => {
 test("migrateUsageDb closes db when migration exec fails", async (t) => {
   const tempDir = mkdtempSync(path.join(tmpdir(), "usage-db-"));
   const dbPath = path.join(tempDir, "usage.sqlite");
+  const originalUsageDbPath = process.env.USAGE_DB_PATH;
   process.env.USAGE_DB_PATH = dbPath;
 
   const originalClose = Database.prototype.close;
@@ -92,8 +109,16 @@ test("migrateUsageDb closes db when migration exec fails", async (t) => {
     throw new Error("exec failed");
   });
 
-  const { migrateUsageDb } = await import("@/lib/db/migrate");
-  assert.throws(() => migrateUsageDb(), /exec failed/);
+  try {
+    const { migrateUsageDb } = await import("@/lib/db/migrate");
+    assert.throws(() => migrateUsageDb(), /exec failed/);
+  } finally {
+    if (originalUsageDbPath === undefined) {
+      delete process.env.USAGE_DB_PATH;
+    } else {
+      process.env.USAGE_DB_PATH = originalUsageDbPath;
+    }
+  }
 
   assert.strictEqual(closeSpy.mock.callCount(), 1);
 });
@@ -101,6 +126,7 @@ test("migrateUsageDb closes db when migration exec fails", async (t) => {
 test("openUsageDb enables foreign keys", (t) => {
   const tempDir = mkdtempSync(path.join(tmpdir(), "usage-db-"));
   const dbPath = path.join(tempDir, "usage.sqlite");
+  const originalUsageDbPath = process.env.USAGE_DB_PATH;
   process.env.USAGE_DB_PATH = dbPath;
 
   const originalPragma = Database.prototype.pragma;
@@ -119,14 +145,22 @@ test("openUsageDb enables foreign keys", (t) => {
     mock: { calls: Array<{ arguments: unknown[] }> };
   };
 
-  const db = openUsageDb();
-  const foreignKeys = db.pragma("foreign_keys", { simple: true });
-  db.close();
+  try {
+    const db = openUsageDb();
+    const foreignKeys = db.pragma("foreign_keys", { simple: true });
+    db.close();
 
-  assert.strictEqual(foreignKeys, 1);
-  assert.ok(
-    pragmaSpy.mock.calls.some(
-      (call) => call.arguments[0] === "foreign_keys = ON",
-    ),
-  );
+    assert.strictEqual(foreignKeys, 1);
+    assert.ok(
+      pragmaSpy.mock.calls.some(
+        (call) => call.arguments[0] === "foreign_keys = ON",
+      ),
+    );
+  } finally {
+    if (originalUsageDbPath === undefined) {
+      delete process.env.USAGE_DB_PATH;
+    } else {
+      process.env.USAGE_DB_PATH = originalUsageDbPath;
+    }
+  }
 });

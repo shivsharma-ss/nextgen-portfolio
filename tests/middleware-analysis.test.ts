@@ -1,9 +1,16 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { NextRequest } from "next/server";
+import { createRequire } from "node:module";
 
-// Mock the Clerk environment for the first test
-const originalEnv = process.env;
+// Snapshot of the environment so we can restore it safely between tests
+const originalEnvSnapshot = { ...process.env };
+const restoreEnvSnapshot = () => {
+  Object.keys(process.env).forEach((key) => {
+    delete process.env[key];
+  });
+  Object.assign(process.env, originalEnvSnapshot);
+};
 
 test("current proxy middleware requires Clerk configuration", async () => {
   // Remove Clerk env vars to simulate missing configuration
@@ -17,28 +24,22 @@ test("current proxy middleware requires Clerk configuration", async () => {
     },
   });
 
-  // Import the middleware after removing env vars
-  const { default: proxyMiddleware } = await import("../proxy");
-
-  let hasError = false;
-  let errorMessage = "";
+  const require = createRequire(import.meta.url);
+  delete require.cache[require.resolve("../proxy")];
 
   try {
-    await proxyMiddleware(request, {} as any);
-  } catch (error) {
-    hasError = true;
-    errorMessage = (error as Error).message;
+    const { default: proxyMiddleware } = await import("../proxy");
+    await assert.rejects(
+      async () => {
+        await proxyMiddleware(request, {} as any);
+      },
+      {
+        message: /Missing publishableKey/,
+      },
+    );
+  } finally {
+    restoreEnvSnapshot();
   }
-
-  // Verify that middleware throws when Clerk is not configured
-  assert.equal(hasError, true, "Middleware should throw without Clerk config");
-  assert.ok(
-    errorMessage.includes("Missing publishableKey"),
-    "Should specify missing publishableKey error",
-  );
-
-  // Restore environment
-  process.env = originalEnv;
 });
 
 test("need new middleware for optional auth", async () => {
@@ -66,20 +67,4 @@ test("need new middleware for optional auth", async () => {
   // but the middleware layer requires auth configuration
 });
 
-test("middleware solution should allow optional auth", () => {
-  // Test demonstrates what the solution should look like
-
-  // The matcher should remain the same (exclude static assets, include API)
-  const expectedMatcher = [
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    "/(api|trpc)(.*)",
-  ];
-
-  // The middleware should:
-  // 1. Use clerkMiddleware with authOptional() for guest access
-  // 2. OR implement custom logic that conditionally applies Clerk
-
-  // This is what we need to implement
-  const needsNewMiddleware = true;
-  assert.equal(needsNewMiddleware, true, "We need a new middleware approach");
-});
+test.todo("middleware solution should allow optional auth");

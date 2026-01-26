@@ -43,12 +43,17 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           NEXT_PUBLIC_SANITY_DATASET: ${{ vars.NEXT_PUBLIC_SANITY_DATASET }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          PROJECT_NAME: ${{ vars.VERCEL_PROJECT_NAME || vars.PROJECT_NAME }}
         run: |
           echo "🚀 Deploying to Vercel (non-interactive)..."
           # Use both VERCEL_ORG_ID and VERCEL_PROJECT_ID to ensure correct project
-          VERCEL_ORG_ID=team_wDHfgWg4udPZMUsIPpsJZyE6
-          VERCEL_PROJECT_ID=prj_UIJYujxvcutT9Y1uRVG2KHsAIlON
+          VERCEL_ORG_ID="${VERCEL_ORG_ID}"
+          VERCEL_PROJECT_ID="${VERCEL_PROJECT_ID}"
           export VERCEL_ORG_ID VERCEL_PROJECT_ID
+
+          PROJECT_NAME=${PROJECT_NAME:-shivansh-portfolio}
           
           # Deploy directly since vercel.json provides explicit project configuration
           DEPLOY_OUTPUT=$(npx vercel --token "$VERCEL_TOKEN" --prod --yes --env NEXT_PUBLIC_SANITY_DATASET="$NEXT_PUBLIC_SANITY_DATASET" --env SANITY_STUDIO_DATASET="$NEXT_PUBLIC_SANITY_DATASET")
@@ -60,11 +65,11 @@ jobs:
           echo "$DEPLOY_OUTPUT"
           
           # Extract deployment URL from Vercel output
-          DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE 'https://shivansh-portfolio-[^[:space:]]+\.vercel\.app' | head -1)
+          DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE "https://${PROJECT_NAME}-[^[:space:]]+\.vercel\.app" | head -1)
           
           # Fallback: extract any Vercel deployment URL if the pattern doesn't match
           if [ -z "$DEPLOY_URL" ]; then
-            DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE 'https://[^[:space:]]+\.vercel\.app' | grep -E 'shivansh-portfolio' | head -1)
+            DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE 'https://[^[:space:]]+\.vercel\.app' | grep -E "${PROJECT_NAME}" | head -1)
           fi
           
           if [ -z "$DEPLOY_URL" ]; then
@@ -72,8 +77,8 @@ jobs:
             exit 1
           fi
           
-           echo "deployment_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
-           echo "✅ Deployment URL captured: $DEPLOY_URL"
+          echo "deployment_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "✅ Deployment URL captured: $DEPLOY_URL"
 
       - name: Verify production deployment
         env:

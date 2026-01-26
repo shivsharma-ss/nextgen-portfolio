@@ -1,5 +1,3 @@
-PRAGMA foreign_keys = ON;
-
 CREATE TABLE IF NOT EXISTS usage_visitors (
   id TEXT PRIMARY KEY,
   created_at INTEGER NOT NULL DEFAULT (unixepoch()),

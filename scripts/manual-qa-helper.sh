@@ -68,7 +68,7 @@ API Verification:
 - Open DevTools Network tab
 - Look for calls to:
   * /api/chat/create-session
-  * /api/usage/status
+  * /api/chat/usage
 - Verify responses include correct limits
 
 Expected Behaviors:
