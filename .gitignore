@@ -61,9 +61,17 @@ dist/
 instructions.md
 commenting_instructions.md
 readme_instructions.md
+deployment-status.md
+test-results.md
+CLERK_MIDDLEWARE_ANALYSIS.md
+
+plans/*
 
 # generated sanity files
 sanity.types.ts
 schema.json
 sanity-typegen.json
 .env*.local
+
+# clerk configuration (can include secrets)
+/.clerk/

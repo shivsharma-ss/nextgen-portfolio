@@ -2,15 +2,22 @@
 
 import { SignInButton, useUser } from "@clerk/nextjs";
 import { MessageSquare, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { UsageStatusResponse } from "@/lib/usage/api";
+import { fetchUsageStatus } from "@/lib/usage/client";
 import { useSidebar } from "./ui/sidebar";
 
 function SidebarToggle() {
   const { toggleSidebar, open, isMobile, openMobile } = useSidebar();
   const { isSignedIn } = useUser();
+  const [usage, setUsage] = useState<UsageStatusResponse | null>(null);
 
   const isSidebarOpen = isMobile ? openMobile : open;
-
-  if (isSidebarOpen) return null;
+  const isUsageLimited = Boolean(usage?.isLimited);
+  const shouldGateWithSignIn = !isSignedIn && isUsageLimited;
+  const tooltipText = shouldGateWithSignIn
+    ? "Daily limit reached — sign in to continue"
+    : "Chat with My AI Twin";
 
   const buttonStyles = `relative w-16 h-16 rounded-full 
     bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 
@@ -20,6 +27,32 @@ function SidebarToggle() {
     transition-all duration-500 
     hover:scale-110 hover:rotate-12 
     flex items-center justify-center`;
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    void (async () => {
+      try {
+        const payload = await fetchUsageStatus(fetch, "/api/chat/usage", {
+          signal: controller.signal,
+        });
+        if (!payload || controller.signal.aborted) {
+          return;
+        }
+        setUsage(payload);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        if (error instanceof DOMException && error.name === "AbortError")
+          return;
+      }
+    })();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
+
+  if (isSidebarOpen) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 group">
@@ -36,12 +69,22 @@ function SidebarToggle() {
 
       {/* Tooltip */}
       <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 rounded-lg bg-white/90 dark:bg-black/90 backdrop-blur-xl border border-white/40 dark:border-white/20 text-sm font-medium text-neutral-800 dark:text-neutral-200 whitespace-nowrap opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100 group-hover:-translate-y-1 transition-all duration-300 pointer-events-none shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
-        Chat with My AI Twin
+        {tooltipText}
         {/* Tooltip arrow */}
         <div className="absolute -bottom-1 right-6 w-2 h-2 rotate-45 bg-white/90 dark:bg-black/90 border-r border-b border-white/40 dark:border-white/20" />
       </div>
 
-      {isSignedIn ? (
+      {shouldGateWithSignIn ? (
+        <SignInButton mode="modal">
+          <button
+            type="button"
+            className={buttonStyles}
+            aria-label="Sign in to continue chatting"
+          >
+            <MessageSquare className="h-7 w-7 text-white transition-transform group-hover:scale-110" />
+          </button>
+        </SignInButton>
+      ) : (
         <button
           type="button"
           onClick={toggleSidebar}
@@ -50,16 +93,6 @@ function SidebarToggle() {
         >
           <MessageSquare className="h-7 w-7 text-white transition-transform group-hover:scale-110" />
         </button>
-      ) : (
-        <SignInButton mode="modal">
-          <button
-            type="button"
-            className={buttonStyles}
-            aria-label="Sign in to chat with AI Twin"
-          >
-            <MessageSquare className="h-7 w-7 text-white transition-transform group-hover:scale-110" />
-          </button>
-        </SignInButton>
       )}
     </div>
   );

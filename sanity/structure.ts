@@ -204,6 +204,18 @@ export const structure: StructureResolver = (S) =>
 
       S.divider(),
 
+      // AI Chat Settings (Singleton)
+      S.listItem()
+        .title("AI Chat Settings")
+        .icon(CommentIcon)
+        .child(
+          S.document()
+            .schemaType("chatUsageLimits")
+            .documentId("singleton-chatUsageLimits"),
+        ),
+
+      S.divider(),
+
       // Site Settings (Singleton)
       S.listItem()
         .title("Site Settings")

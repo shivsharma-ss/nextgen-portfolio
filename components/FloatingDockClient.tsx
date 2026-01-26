@@ -1,7 +1,7 @@
 "use client";
 
-import { useClerk, useUser } from "@clerk/nextjs";
-import { IconLogout, IconMenu2, IconX } from "@tabler/icons-react";
+import { SignInButton, useClerk, useUser } from "@clerk/nextjs";
+import { IconLogin, IconLogout, IconMenu2, IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
 import { DynamicIcon } from "./DynamicIcon";
@@ -24,6 +24,7 @@ interface DockLink {
   icon: React.ReactNode;
   isExternal?: boolean | null;
   onClick?: () => void;
+  isSignInButton?: boolean;
 }
 
 const MAX_VISIBLE_ITEMS_DESKTOP = 6;
@@ -61,6 +62,15 @@ export function FloatingDockClient({ navItems }: FloatingDockClientProps) {
             title: "Sign Out",
             icon: <IconLogout className="h-full w-full" />,
             onClick: () => signOut(),
+          },
+        ]
+      : []),
+    ...(!isSignedIn && !isSidebarOpen
+      ? [
+          {
+            title: "Sign In",
+            icon: <IconLogin className="h-full w-full" />,
+            isSignInButton: true,
           },
         ]
       : []),
@@ -269,7 +279,20 @@ function DockIcon({
   const wrapperClasses =
     "group relative flex items-center justify-center w-12 h-12 md:w-12 md:h-12";
 
-  return item.onClick ? (
+  return item.isSignInButton ? (
+    <SignInButton mode="modal">
+      <button
+        type="button"
+        className={wrapperClasses}
+        onClick={onItemClick}
+        onKeyDown={
+          onItemClick ? (e) => e.key === "Enter" && onItemClick() : undefined
+        }
+      >
+        {content}
+      </button>
+    </SignInButton>
+  ) : item.onClick ? (
     <button type="button" onClick={handleClick} className={wrapperClasses}>
       {content}
     </button>

@@ -19,6 +19,7 @@ import { FloatingDock } from "@/components/FloatingDock";
 import SidebarToggle from "@/components/SidebarToggle";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import VisitorBootstrap from "@/components/usage/VisitorBootstrap";
 import { SanityLive } from "@/sanity/lib/live";
 import "../globals.css";
 
@@ -72,6 +73,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <VisitorBootstrap />
             <Script
               src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js"
               strategy="afterInteractive"

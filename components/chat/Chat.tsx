@@ -1,7 +1,17 @@
 "use client";
 
 import { ChatKit, useChatKit } from "@openai/chatkit-react";
+import { useEffect, useRef, useState } from "react";
 import { createSession } from "@/app/actions/create-session";
+import type { UsageStatusResponse } from "@/lib/usage/api";
+import { buildUsageStatusResponse } from "@/lib/usage/api";
+import {
+  buildUsageBannerState,
+  fetchUsageStatus,
+  isMessageSendLog,
+  isUsageLimitError,
+} from "@/lib/usage/client";
+import { UsageLimitError } from "@/lib/usage/session";
 import type { CHAT_PROFILE_QUERYResult } from "@/sanity.types";
 import { useSidebar } from "../ui/sidebar";
 
@@ -11,6 +21,11 @@ export function Chat({
   profile: CHAT_PROFILE_QUERYResult | null;
 }) {
   const { toggleSidebar } = useSidebar();
+  const [usage, setUsage] = useState<UsageStatusResponse | null>(null);
+  const [limitReached, setLimitReached] = useState(false);
+  const isMountedRef = useRef(true);
+  const usageAbortRef = useRef<AbortController | null>(null);
+  const logAbortRef = useRef<AbortController | null>(null);
   // Generate greeting based on available profile data
   const getGreeting = () => {
     if (!profile?.firstName) {
@@ -29,8 +44,43 @@ export function Chat({
     api: {
       getClientSecret: async (_existingSecret) => {
         // Called on initial load and when session needs refresh, we dont actuall use the existing secret as userId is managed by Clerk
-        return createSession();
+        setLimitReached(false);
+        try {
+          return await createSession();
+        } catch (error) {
+          if (isUsageLimitError(error)) {
+            setLimitReached(true);
+            if (error instanceof UsageLimitError) {
+              setUsage(
+                buildUsageStatusResponse({
+                  status: error.details.status,
+                  limits: error.details.limits,
+                }),
+              );
+            }
+          }
+          throw error;
+        }
       },
+    },
+    onLog: (event) => {
+      if (!isMessageSendLog(event)) {
+        return;
+      }
+
+      void (async () => {
+        logAbortRef.current?.abort();
+        const controller = new AbortController();
+        logAbortRef.current = controller;
+        const payload = await fetchUsageStatus(fetch, "/api/chat/message", {
+          method: "POST",
+          signal: controller.signal,
+        });
+        if (!payload || controller.signal.aborted || !isMountedRef.current) {
+          return;
+        }
+        setUsage(payload);
+      })();
     },
     // https://chatkit.studio/playground
     theme: {},
@@ -97,7 +147,59 @@ export function Chat({
     },
   });
 
-  return <ChatKit control={control} className="h-full w-full z-50" />;
+  useEffect(() => {
+    const controller = new AbortController();
+    usageAbortRef.current?.abort();
+    usageAbortRef.current = controller;
+
+    void (async () => {
+      const payload = await fetchUsageStatus(fetch, "/api/chat/usage", {
+        signal: controller.signal,
+      });
+      if (!payload || controller.signal.aborted || !isMountedRef.current) {
+        return;
+      }
+      setUsage(payload);
+    })();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      usageAbortRef.current?.abort();
+      logAbortRef.current?.abort();
+    };
+  }, []);
+
+  const banner = buildUsageBannerState({ usage, limitReached });
+
+  return (
+    <div className="h-full w-full z-50 flex flex-col">
+      {banner ? (
+        <div
+          className={
+            banner.tone === "limit"
+              ? "mb-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900"
+              : "mb-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700"
+          }
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <span>{banner.message}</span>
+            {banner.showCta ? (
+              <a className="font-semibold underline" href="/sign-in">
+                Sign in
+              </a>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+      <ChatKit control={control} className="h-full w-full flex-1" />
+    </div>
+  );
 }
 
 export default Chat;

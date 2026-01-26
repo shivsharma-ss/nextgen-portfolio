@@ -22,9 +22,17 @@ export const dataset = assertValue(
  * Main responsibilities: Validate presence of project configuration.
  * Errors: Throws when SANITY_STUDIO_PROJECT_ID or NEXT_PUBLIC_SANITY_PROJECT_ID is missing.
  */
+/**
+ * Purpose: Provide the shared project ID during local development when
+ * a developer has not yet configured their environment.
+ */
+const fallbackProjectId =
+  process.env.NODE_ENV === "development" ? "mdokvla9" : undefined;
+
 export const projectId = assertValue(
   process.env.SANITY_STUDIO_PROJECT_ID ??
-    process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+    process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ??
+    fallbackProjectId,
   "Missing environment variable: SANITY_STUDIO_PROJECT_ID or NEXT_PUBLIC_SANITY_PROJECT_ID",
 );
 
